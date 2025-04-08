@@ -1283,7 +1283,7 @@ int decodeESC_VoltageCommandPacket(const void* _pg_pkt, uint16_t* voltageCommand
  * \param _pg_pkt points to the packet which will be created by this function
  * \param _pg_user points to the user data that will be encoded in _pg_pkt
  */
-void encodeESC_StatusAPacketStructure(void* _pg_pkt, const ESC_StatusA_t* _pg_user)
+void encodeESC_StatusAPacketStructure(void* _pg_pkt, const ESC_Status00_t* _pg_user)
 {
     uint8_t* _pg_data = getESCVelocityPacketData(_pg_pkt);
     int _pg_byteindex = 0;
@@ -1326,12 +1326,12 @@ void encodeESC_StatusAPacketStructure(void* _pg_pkt, const ESC_StatusA_t* _pg_us
  * \param _pg_user receives the data decoded from the packet
  * \return 0 is returned if the packet ID or size is wrong, else 1
  */
-int decodeESC_StatusAPacketStructure(const void* _pg_pkt, ESC_StatusA_t* _pg_user)
+int decodeESC_StatusAPacketStructure(const void* _pg_pkt, ESC_Status00_t* _pg_user)
 {
     int _pg_numbytes;
     int _pg_byteindex = 0;
     const uint8_t* _pg_data;
-    unsigned int _pg_tempbitfield = 0;
+    // unsigned int _pg_tempbitfield = 0;
 
     // Verify the packet identifier
     if(getESCVelocityPacketID(_pg_pkt) != getESC_StatusAPacketID())
@@ -1345,30 +1345,35 @@ int decodeESC_StatusAPacketStructure(const void* _pg_pkt, ESC_StatusA_t* _pg_use
     // The raw data from the packet
     _pg_data = getESCVelocityPacketDataConst(_pg_pkt);
 
-    // Set to 1 to indicate a Gen-2 ESC
-    _pg_tempbitfield = (_pg_data[_pg_byteindex] >> 7);
-    // Decoded value must be 1
-    if(_pg_tempbitfield != 1)
-        return 0;
+    // // Set to 1 to indicate a Gen-2 ESC
+    // _pg_tempbitfield = (_pg_data[_pg_byteindex] >> 7);
+    // // Decoded value must be 1
+    // if(_pg_tempbitfield != 1)
+    //     return 0;
 
     // Reserved for future use
 
+    // Motor speed
+    // Range of rpm is -15000 to 15000.
+    _pg_user->rpm = uint16FromLeBytes(_pg_data, &_pg_byteindex) - 15000;
+
+    // Motor AC Voltage V
+    // Range of rpm is 0 to 1000.
+    _pg_user->motorVoltage = uint16FromLeBytes(_pg_data, &_pg_byteindex) - 1000;
+
     // ESC operating mode. The lower four bits indicate the operational mode of the ESC, in accordance with the ESCOperatingModes enumeration. The upper three bits are used for debugging and should be ignored for general use.
     // Range of mode is 0 to 15.
-    _pg_user->mode = ((_pg_data[_pg_byteindex]) & 0xF);
+    _pg_user->life1_enum_m = ((_pg_data[_pg_byteindex]) >> 12);
     _pg_byteindex += 1; // close bit field
 
-    // ESC status bits
-    if(decodeESC_StatusBits_t(_pg_data, &_pg_byteindex, &_pg_user->status) == 0)
-        return 0;
+    // // ESC status bits
+    // if(decodeESC_StatusBits_t(_pg_data, &_pg_byteindex, &_pg_user->status) == 0)
+    //     return 0;
 
     // ESC operational command - value depends on 'mode' available in this packet. If the ESC is disabled, data reads 0x0000. If the ESC is in open-loop PWM mode, this value is the PWM command in units of 1us, in the range 1000us to 2000us. If the ESC is in closed-loop RPM mode, this value is the RPM command in units of 1RPM
     // Range of command is 0 to 65535.
-    _pg_user->command = uint16FromBeBytes(_pg_data, &_pg_byteindex);
+    // _pg_user->command = uint16FromBeBytes(_pg_data, &_pg_byteindex);
 
-    // Motor speed
-    // Range of rpm is 0 to 65535.
-    _pg_user->rpm = uint16FromBeBytes(_pg_data, &_pg_byteindex);
 
     return 1;
 
@@ -1533,8 +1538,11 @@ int decodeESC_StatusBPacketStructure(const void* _pg_pkt, ESC_StatusB_t* _pg_use
     const uint8_t* _pg_data;
 
     // Verify the packet identifier
-    if(getESCVelocityPacketID(_pg_pkt) != getESC_StatusBPacketID())
+    if(getESCVelocityPacketID(_pg_pkt) != getESC_StatusBPacketID()){
+        
         return 0;
+    }
+        
 
     // Verify the packet size
     _pg_numbytes = getESCVelocityPacketSize(_pg_pkt);
@@ -1544,25 +1552,33 @@ int decodeESC_StatusBPacketStructure(const void* _pg_pkt, ESC_StatusB_t* _pg_use
     // The raw data from the packet
     _pg_data = getESCVelocityPacketDataConst(_pg_pkt);
 
-    // ESC Rail Voltage
-    // Range of voltage is 0 to 65535.
-    _pg_user->voltage = uint16FromBeBytes(_pg_data, &_pg_byteindex);
-
-    // ESC Current. Current IN to the ESC is positive. Current OUT of the ESC is negative
-    // Range of current is -32768 to 32767.
-    _pg_user->current = int16FromBeBytes(_pg_data, &_pg_byteindex);
-
-    // ESC Motor Duty Cycle
-    // Range of dutyCycle is 0 to 65535.
-    _pg_user->dutyCycle = uint16FromBeBytes(_pg_data, &_pg_byteindex);
-
-    // ESC Logic Board Temperature
-    // Range of escTemperature is -128 to 127.
-    _pg_user->escTemperature = int8FromBytes(_pg_data, &_pg_byteindex);
+    // 
+    // 
+    _pg_user->DTC_enum = uint16FromLeBytes(_pg_data, &_pg_byteindex);
 
     // ESC Motor Temperature
     // Range of motorTemperature is 0 to 255.
-    _pg_user->motorTemperature = uint8FromBytes(_pg_data, &_pg_byteindex);
+    _pg_user->motorTemperature = uint8FromBytes(_pg_data, &_pg_byteindex) - 40;
+
+    // ESC Logic Board Temperature
+    // Range of escTemperature is -128 to 127.
+    _pg_user->escTemperature = int8FromBytes(_pg_data, &_pg_byteindex) - 40;
+
+    // ESC Rail Voltage
+    // Range of voltage is 0 to 65535.
+    _pg_user->voltage = uint16FromLeBytes(_pg_data, &_pg_byteindex);
+
+    // // ESC Current. Current IN to the ESC is positive. Current OUT of the ESC is negative
+    // // Range of current is -32768 to 32767.
+    // _pg_user->current = int16FromBeBytes(_pg_data, &_pg_byteindex);
+
+    //
+    //
+    _pg_user->errLv = int8FromBytes(_pg_data, &_pg_byteindex);
+
+    // ESC Motor Duty Cycle
+    // Range of dutyCycle is 0 to 65535.
+    _pg_user->dutyCycle = int8FromBytes(_pg_data, &_pg_byteindex);
 
     return 1;
 

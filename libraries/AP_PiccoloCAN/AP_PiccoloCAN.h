@@ -80,6 +80,11 @@ public:
     // test if the Piccolo CAN driver is ready to be armed
     bool pre_arm_check(char* reason, uint8_t reason_len);
 
+    // // called from SRV_Channels
+    // void update_voltage(uint8_t chan, uint16_t voltage);
+
+    
+
 private:
 
     // loop to send output to ESCs in background thread
@@ -133,6 +138,9 @@ private:
 
     AP_Int16 _ecu_id;        //! ECU Node ID
     AP_Int16 _ecu_hz;       //! ECU update rate (Hz)
+
+    // // IEE CAN parameters
+    // uint16_t _DCVoltage[4];
 
     HAL_Semaphore _telem_sem;
 };

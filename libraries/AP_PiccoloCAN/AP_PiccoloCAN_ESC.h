@@ -57,13 +57,25 @@ public:
 
     // Status / telemetry data
     struct Status_t {
-        ESC_StatusA_t statusA;
+        ESC_Status00_t statusA;
         ESC_StatusB_t statusB;
         ESC_StatusC_t statusC;
 
         ESC_WarningBits_t warnings;
         ESC_ErrorBits_t errors;
     } status;
+
+    // Status / telemetry data iee
+    struct Status_VCU3 {
+        uint16_t rpm;              //!< Motor speed
+        uint16_t motorVoltage;     //!< ESC Rail Voltage
+        int16_t  ACCurrent;        //!< ESC Current. //Current IN to the ESC is positive. Current OUT of the ESC is negative
+
+        uint16_t DTC_enum;         //!< Error Report
+        uint8_t  motorTemperature; //!< ESC Motor Temperature Celsius offset -40
+        uint8_t  MCUTemperature;   //!< ESC Logic Board Temperature Celsius offset -40
+        uint8_t  life_enum;        //!< 0~15
+    } status_iee;
 
     // Settings information
     struct Settings_t {

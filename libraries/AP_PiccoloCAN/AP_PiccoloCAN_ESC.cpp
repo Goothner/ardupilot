@@ -145,7 +145,7 @@ uint32_t getESCVelocityPacketID(const void* pkt)
     AP_HAL::CANFrame* frame = (AP_HAL::CANFrame*) pkt;
 
     // Extract the message ID field from the 29-bit ID
-    return (uint32_t) ((frame->id >> 16) & 0xFF);
+    return (uint32_t) ((frame->id >> 8) & 0xFF);
 }
 
 #endif // HAL_PICCOLO_CAN_ENABLE

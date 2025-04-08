@@ -184,8 +184,8 @@ void AP_PiccoloCAN::loop()
 #endif
 
     // CAN Frame ID components
-    uint8_t frame_id_group;     // Piccolo message group
-    uint16_t frame_id_device;   // Device identifier
+    // uint8_t frame_id_group;     // Piccolo message group
+    // uint16_t frame_id_device;   // Device identifier
 
     while (true) {
 
@@ -238,39 +238,43 @@ void AP_PiccoloCAN::loop()
         while (read_frame(rxFrame, timeout)) {
 
             // Extract group and device ID values from the frame identifier
-            frame_id_group = (rxFrame.id >> 24) & 0x1F;
-            frame_id_device = (rxFrame.id >> 8) & 0xFF;
+            // frame_id_group = (rxFrame.id >> 24) & 0x1F;
+            // frame_id_device = (rxFrame.id >> 8) & 0xFF;
 
             // Only accept extended messages
-            if ((rxFrame.id & AP_HAL::CANFrame::FlagEFF) == 0) {
-                continue;
-            }
+            // if ((rxFrame.id & AP_HAL::CANFrame::FlagEFF) == 0) {
+            //     continue;
+            // }
+            //hal.console->printf("\n\n NFCY test! %.2f \n\n", 1.234f);
+            //hal.console->printf("\n\n NFCY test! %lX \n", ((rxFrame.id >> 8) & 0xFF)==0x02 ? ((rxFrame.id >> 8) & 0xFF):0x18);
+            //hal.console->printf("\n\n NFCY test! %0lX with 0 to 7: %X, %X, %X, %X, %X, %X, %X, %X", rxFrame.id, rxFrame.data[0], rxFrame.data[1], rxFrame.data[2], rxFrame.data[3], rxFrame.data[4], rxFrame.data[5], rxFrame.data[6], rxFrame.data[7]);
+            // write_frame(rxFrame, timeout);
+            handle_esc_message(rxFrame);
+            // switch (PiccoloCAN_MessageGroup(frame_id_group)) {
+            // // ESC messages exist in the ACTUATOR group
+            // case PiccoloCAN_MessageGroup::ACTUATOR:
 
-            switch (PiccoloCAN_MessageGroup(frame_id_group)) {
-            // ESC messages exist in the ACTUATOR group
-            case PiccoloCAN_MessageGroup::ACTUATOR:
+            //     switch (PiccoloCAN_ActuatorType(frame_id_device)) {
+            //     case PiccoloCAN_ActuatorType::SERVO:
+            //         handle_servo_message(rxFrame);
+            //         break;
+            //     case PiccoloCAN_ActuatorType::ESC:
+            //         handle_esc_message(rxFrame);
+            //         break;
+            //     default:
+            //         // Unknown actuator type
+            //         break;
+            //     }
 
-                switch (PiccoloCAN_ActuatorType(frame_id_device)) {
-                case PiccoloCAN_ActuatorType::SERVO:
-                    handle_servo_message(rxFrame);
-                    break;
-                case PiccoloCAN_ActuatorType::ESC:
-                    handle_esc_message(rxFrame);
-                    break;
-                default:
-                    // Unknown actuator type
-                    break;
-                }
-
-                break;
-            case PiccoloCAN_MessageGroup::ECU_OUT:
-            #if AP_EFI_CURRAWONG_ECU_ENABLED
-                handle_ecu_message(rxFrame);
-            #endif
-                break;
-            default:
-                break;
-            }
+            //     break;
+            // case PiccoloCAN_MessageGroup::ECU_OUT:
+            // #if AP_EFI_CURRAWONG_ECU_ENABLED
+            //     handle_ecu_message(rxFrame);
+            // #endif
+            //     break;
+            // default:
+            //     break;
+            // }
         }
     }
 }
@@ -561,15 +565,33 @@ void AP_PiccoloCAN::send_esc_messages(void)
         return;
     }
 
+    // // WITH_SEMAPHORE?
+    // WITH_SEMAPHORE(_telem_sem);
+
+    // // new AP_PiccoloCAN_ESC?
+    
     // System is armed - send out ESC commands
-    if (hal.util->get_soft_armed()) {
+    if (true) {//if (hal.util->get_soft_armed())
 
         bool send_cmd = false;
         int16_t cmd[4] {};
         uint8_t idx;
+        //
+        int16_t ecs_raw[4] {};
+        float voltage[4] {};
+        static const int16_t cmd_max = 7000;
+        static const int16_t speed_limit = 7000;
+        uint8_t enable_flag[4] {};
+        enable_flag[0] = 0x00;
+        enable_flag[1] = 0x00;
+        enable_flag[2] = 0x00;
+        enable_flag[3] = 0x00;
+        //uint8_t id_iee = 1;
 
+        
         // Transmit bulk command packets to 4x ESC simultaneously
-        for (uint8_t ii = 0; ii < PICCOLO_CAN_MAX_GROUP_ESC; ii++) {
+        // for (uint8_t ii = 0; ii < PICCOLO_CAN_MAX_GROUP_ESC; ii++) {
+        for (uint8_t ii = 0; ii < 4; ii++) {
 
             send_cmd = false;
 
@@ -601,9 +623,20 @@ void AP_PiccoloCAN::send_esc_messages(void)
                     // A command of 0x7FFF is 'out of range' and will be ignored by the corresponding ESC
                     cmd[jj] = 0x7FFF;
                 }
-            }
 
-            if (send_cmd) {
+            }
+            // //AP_PiccoloCAN_ESC &esc = _escs[idx];
+
+            // // Has the ESC been heard from recently?
+            // if (is_esc_present(ii)) {
+            //     dataAvailable = true;
+
+            //     // Provide the maximum ESC temperature in the telemetry stream
+            //     voltage[ii] = esc.voltage() * 10;      // Convert to cV
+            // } else {
+            //     voltage[ii] = 0;
+            // }
+            if (send_cmd||true) {//if (send_cmd)
                 encodeESC_CommandMultipleESCsPacket(
                     &txFrame,
                     cmd[0],
@@ -613,8 +646,57 @@ void AP_PiccoloCAN::send_esc_messages(void)
                     (PKT_ESC_SETPOINT_1 + ii)
                 );
 
+                //
+                ecs_raw[ii] = cmd_max * (hal.rcout->scale_esc_to_unity(SRV_Channels::srv_channel(ii)->get_output_pwm()) + 1.0) / 2.0;
+                //this.get_voltage(ii, voltage)
+
+                //speed limit
+                ecs_raw[ii] = ecs_raw[ii] > speed_limit ? speed_limit : ecs_raw[ii];
+                //
+                voltage[ii] = _escs[ii].voltage() * 10.0;
+                hal.console->printf("\n\n NFCY test! _ecs[%d], voltage = %f \n", ii, voltage[ii]);
+                //
+                if(voltage[ii] < 550.0)
+                {
+                    enable_flag[ii] = 0x00;
+                }
+                else
+                {
+                    enable_flag[ii] = (ii % 3 == 0) ? 0x14 : 0x24;
+                    // if(ii==0){enable_flag[ii] = 0x14;}
+                    // else if(ii==1){enable_flag[ii] = 0x24;}
+                    // else if(ii==2){enable_flag[ii] = 0x24;}
+                    // else{enable_flag[ii] = 0x14;}
+                }
+                
                 // Broadcast the command to all ESCs
-                txFrame.id |= 0xFF;
+                // txFrame.id |= 0x8000000;
+                // txFrame.id &= 0x4FFFFFF;
+                if(ii==0)
+                {
+                    txFrame.id = 0x8CFF01EF;
+                }
+                else if(ii==1)
+                {
+                    txFrame.id = 0x8CFF02EF;
+                }
+                else if(ii==2)
+                {
+                    txFrame.id = 0x8CFF03EF;
+                }
+                else
+                {
+                    txFrame.id = 0x8CFF04EF;
+                }
+                txFrame.dlc = 8;
+                txFrame.data[0] = enable_flag[ii];
+                txFrame.data[1] = 0x02U;//lifenumber
+                txFrame.data[2] = speed_limit % 256;//0x58U;
+                txFrame.data[3] = speed_limit / 256;//0x0B;//0x1BU;//0x0BB8 = 3000
+                txFrame.data[4] = 0x00U;
+                txFrame.data[5] = 0x00U;
+                txFrame.data[6] = ecs_raw[ii] % 256;
+                txFrame.data[7] = ecs_raw[ii] / 256;
 
                 write_frame(txFrame, timeout);
             }
@@ -677,6 +759,7 @@ bool AP_PiccoloCAN::handle_esc_message(AP_HAL::CANFrame &frame)
         return false;
     }
 
+    
     return _escs[addr].handle_can_frame(frame);
 }
 
@@ -856,6 +939,12 @@ bool AP_PiccoloCAN::pre_arm_check(char* reason, uint8_t reason_len)
 
     return true;
 }
+
+// void update_voltage(uint8_t chan, uint16_t voltage)
+// {
+//     uint8_t _motor_index  = chan - 1;
+//     _DCVoltage[_motor_index] = voltage;
+// }
 
 
 #endif // HAL_PICCOLO_CAN_ENABLE
