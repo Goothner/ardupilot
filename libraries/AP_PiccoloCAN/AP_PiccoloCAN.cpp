@@ -698,7 +698,7 @@ void AP_PiccoloCAN::send_esc_messages(void)
                 txFrame.data[6] = ecs_raw[ii] % 256;
                 txFrame.data[7] = ecs_raw[ii] / 256;
 
-                write_frame(txFrame, timeout);
+                write_frame(txFrame, timeout);//output onto CAN bus
             }
         }
 
