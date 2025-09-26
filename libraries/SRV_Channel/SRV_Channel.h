@@ -189,6 +189,30 @@ public:
         k_rcin15_mapped         = 154,
         k_rcin16_mapped         = 155,
         k_lift_release          = 156,
+        // k_motor18               = 157,
+        // k_motor19               = 158,
+        // k_motor20               = 159,
+        // k_motor13               = 160,
+        // k_motor14               = 161,
+        // k_motor15               = 162,
+        // k_motor16               = 163,
+        // k_motor17               = 164,
+        // k_motor21               = 165,
+        // k_motor22               = 166,
+        // k_motor23               = 167,
+        // k_motor24               = 168,
+        k_motor22               = 157,
+        k_motor23               = 158,
+        k_motor24               = 159,
+        k_motor13               = 160,
+        k_motor14               = 161,
+        k_motor15               = 162,
+        k_motor16               = 163,
+        k_motor17               = 164,
+        k_motor18               = 165,
+        k_motor19               = 166,
+        k_motor20               = 167,
+        k_motor21               = 168,
         k_nr_aux_servo_functions         ///< This must be the last enum value (only add new values _before_ this one)
     } Aux_servo_function_t;
 
@@ -539,7 +563,21 @@ public:
         if (channel < 8) {
             return SRV_Channel::Aux_servo_function_t(SRV_Channel::k_motor1+channel);
         }
-        return SRV_Channel::Aux_servo_function_t((SRV_Channel::k_motor9+(channel-8)));
+        else if (channel < 12) {
+            return SRV_Channel::Aux_servo_function_t((SRV_Channel::k_motor9+(channel-8)));
+        }
+        // else if (channel < 15){
+        //     return SRV_Channel::Aux_servo_function_t((SRV_Channel::k_motor13+(channel-12)));
+        // }
+        // else {
+        //     return SRV_Channel::Aux_servo_function_t((SRV_Channel::k_motor16+(channel-15)));
+        // }
+        else if (channel < 21){
+            return SRV_Channel::Aux_servo_function_t((SRV_Channel::k_motor13+(channel-12)));
+        }
+        else {
+            return SRV_Channel::Aux_servo_function_t((SRV_Channel::k_motor22+(channel-21)));
+        }
     }
 
     void cork();

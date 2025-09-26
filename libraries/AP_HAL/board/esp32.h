@@ -86,7 +86,7 @@
 #endif
 
 // we don't need 32, 16 is enough
-#define NUM_SERVO_CHANNELS 16
+#define NUM_SERVO_CHANNELS 32
 
 // disble temp cal of gyros by default
 #define HAL_INS_TEMPERATURE_CAL_ENABLE 0

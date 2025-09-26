@@ -236,7 +236,7 @@ const AP_Param::GroupInfo SRV_Channels::var_info[] = {
     // @Description: This allows for up to 32 outputs, enabling parameters for outputs above 16
     // @User: Advanced
     // @Values: 0:Disabled,1:Enabled
-    AP_GROUPINFO_FLAGS("_32_ENABLE", 43, SRV_Channels, enable_32_channels, 0, AP_PARAM_FLAG_ENABLE),
+    AP_GROUPINFO_FLAGS("_32_ENABLE", 43, SRV_Channels, enable_32_channels, 1, AP_PARAM_FLAG_ENABLE),
 #endif
 
 #if (NUM_SERVO_CHANNELS >= 17)

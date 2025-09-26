@@ -542,13 +542,16 @@ bool SRV_Channels::set_aux_channel_default(SRV_Channel::Aux_servo_function_t fun
 {
     if (function_assigned(function)) {
         // already assigned
+        hal.console->printf("\n\n bb assigned! Channel %u onto function %u\n\n", channel+1, (int)function);
         return true;
     }
     if (channels[channel].function != SRV_Channel::k_none) {
         if (channels[channel].function == function) {
+            // newly assigned
+            hal.console->printf("\n\n New! Channel %u onto function %u\n\n", channel+1, (int)function);
             return true;
         }
-        hal.console->printf("Channel %u already assigned function %u\n",
+        hal.console->printf("\n\n Channel %u already assigned function %u\n",
                             (unsigned)(channel + 1),
                             (unsigned)channels[channel].function.get());
         return false;
