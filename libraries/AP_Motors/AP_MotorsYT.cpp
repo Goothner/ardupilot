@@ -17,6 +17,7 @@
 #include <AP_Math/AP_Math.h>
 #include "AP_MotorsYT.h"
 #include <AP_Vehicle/AP_Vehicle_Type.h>
+#include <cmath>
 
 extern const AP_HAL::HAL& hal;
 
@@ -213,6 +214,132 @@ float AP_MotorsYT::boost_ratio(float boost_value, float normal_value) const
 // includes new scaling stability patch
 void AP_MotorsYT::output_armed_stabilizing()
 {
+    float X[80];//float
+    float A[80];
+    float V[16];
+    int32_t r;//int32_t
+    int32_t vcol;
+    float U[80];
+    bool p;//bool
+    float absx;
+    int32_t ar;
+    int32_t ia;
+    int32_t b;
+    int32_t ib;
+    int32_t b_ic;
+    float rtb_VectorConcatenate[4];
+    float rtb_CTz_Lookup[20];
+    float rtb_CTx_Lookup[20];
+    float rtb_CTz_Lookup_i;
+    int32_t A_tmp;
+    for (vcol = 0; vcol < 20; vcol++) {
+        // Lookup_n-D: '<S1>/CTx_Lookup' incorporates:
+        //   Constant: '<Root>/DF_DEG'
+
+        absx = look1_iflf_binlxpw(_DF_DEG_Value[vcol], _CTx_Lookup_bp01Data, _CTx_Lookup_tableData, 1U);
+
+        // Lookup_n-D: '<S1>/CTz_Lookup' incorporates:
+        //   Constant: '<Root>/DF_DEG'
+
+        rtb_CTz_Lookup_i = look1_iflf_binlxpw(_DF_DEG_Value[vcol], _CTz_Lookup_bp01Data, _CTz_Lookup_tableData, 1U);
+
+        // MATLAB Function: '<S1>/MATLAB Function' incorporates:
+        //   Constant: '<Root>/DF_DEG'
+        //   Constant: '<S1>/Constant'// Expression: vehicle.DUCT.RotDir       //  Referenced by: '<S1>/Constant'
+        //   Constant: '<S1>/Constant1'// Expression: vehicle.DUCT.LeverArm_m  //  Referenced by: '<S1>/Constant1'
+        //   Lookup_n-D: '<S1>/CQ_Lookup'
+
+        A[vcol] = -rtb_CTz_Lookup_i;
+        A_tmp = 3 * vcol + 1;
+        A[vcol + 20] = _vehicle_DUCT_LeverArm_m[A_tmp] *
+        -rtb_CTz_Lookup_i + _vehicle_DUCT_RotDir[vcol] *
+        look1_iflf_binlxpw(_DF_DEG_Value[vcol],
+                            _CQ_Lookup_bp01Data,
+                            _CQ_Lookup_tableData, 1U);
+        A[vcol + 40] = _vehicle_DUCT_LeverArm_m[3 * vcol + 2]
+        * absx + _vehicle_DUCT_LeverArm_m[3 * vcol] *
+        rtb_CTz_Lookup_i;
+        A[vcol + 60] = _vehicle_DUCT_LeverArm_m[A_tmp] *
+        -absx;
+
+        // Lookup_n-D: '<S1>/CTz_Lookup'
+        rtb_CTz_Lookup[vcol] = rtb_CTz_Lookup_i;
+    }
+
+    // MATLAB Function: '<S1>/MATLAB Function'
+    p = true;
+    for (vcol = 0; vcol < 80; vcol++) {
+        X[vcol] = 0.0F;
+        p = (p && ((!rtIsInfF(A[vcol])) && (!rtIsNaNF(A[vcol]))));
+    }
+
+    if (!p) {
+        for (r = 0; r < 80; r++) {
+        //X[r] = (rtNaNF);
+        char buf[0];
+        hal.util->snprintf(buf, sizeof(buf),"\n\n NaN Or INF occured on X!!\n\n");
+        }
+    } else {
+        _svd(A, U, rtb_VectorConcatenate, V);
+        absx = std::abs(rtb_VectorConcatenate[0]);
+        if ((!rtIsInfF(absx)) && (!rtIsNaNF(absx))) {
+            if (absx <= 1.17549435E-38F) {
+             absx = 1.4013E-45F;
+        } 
+        else {
+            int rr;
+            frexpf(absx, &rr);
+            absx = ldexpf(1.0F, rr - 24);
+        }
+        } else {
+        //absx = (rtNaNF);
+        char buf[0];
+        hal.util->snprintf(buf, sizeof(buf),"\n\n NaN Or INF occured on absx!!\n\n");
+        }
+
+        absx *= 20.0F;
+        r = -1;
+        vcol = 0;
+        while ((vcol < 4) && (rtb_VectorConcatenate[vcol] > absx)) {
+        r++;
+        vcol++;
+        }
+
+        if (r + 1 > 0) {
+        vcol = 0;
+        for (A_tmp = 0; A_tmp <= r; A_tmp++) {
+            absx = 1.0F / rtb_VectorConcatenate[A_tmp];
+            for (ar = vcol; ar < vcol + 4; ar++) {
+            V[ar] *= absx;
+            }
+
+            vcol += 4;
+        }
+
+        for (vcol = 0; vcol <= 77; vcol += 4) {
+            for (A_tmp = vcol; A_tmp < vcol + 4; A_tmp++) {
+            X[A_tmp] = 0.0F;
+            }
+        }
+
+        vcol = 0;
+        for (A_tmp = 0; A_tmp <= 77; A_tmp += 4) {
+            ar = -1;
+            vcol++;
+            b = 20 * r + vcol;
+            for (ib = vcol; ib <= b; ib += 20) {
+            ia = ar;
+            for (b_ic = A_tmp; b_ic < A_tmp + 4; b_ic++) {
+                ia++;
+                X[b_ic] += U[ib - 1] * V[ia];
+            }
+
+            ar += 4;
+            }
+        }
+        }
+    }
+
     // apply voltage and air pressure compensation
     const float compensation_gain = thr_lin.get_compensation_gain(); // compensation for battery voltage and altitude
 
@@ -251,27 +378,69 @@ void AP_MotorsYT::output_armed_stabilizing()
     // calculate the highest allowed average thrust that will provide maximum control range
     float throttle_thrust_best_rpy = MIN(0.5f, throttle_avg_max);
 
-    // calculate throttle that gives most possible room for yaw which is the lower of:
-    //      1. 0.5f - (rpy_low+rpy_high)/2.0 - this would give the maximum possible margin above the highest motor and below the lowest
-    //      2. the higher of:
-    //            a) the pilot's throttle input
-    //            b) the point _throttle_rpy_mix between the pilot's input throttle and hover-throttle
-    //      Situation #2 ensure we never increase the throttle above hover throttle unless the pilot has commanded this.
-    //      Situation #2b allows us to raise the throttle above what the pilot commanded but not so far that it would actually cause the copter to rise.
-    //      We will choose #1 (the best throttle for yaw control) if that means reducing throttle to the motors (i.e. we favor reducing throttle *because* it provides better yaw control)
-    //      We will choose #2 (a mix of pilot and hover throttle) only when the throttle is quite low.  We favor reducing throttle instead of better yaw control because the pilot has commanded it
+    float arg_L_NM = roll_thrust * radians(_P_DOT_max_degss) * _JXX_kgm2;
+    float arg_M_NM = pitch_thrust * radians(_Q_DOT_max_degss) * _JYY_kgm2;
+    float arg_N_NM = yaw_thrust * radians(_R_DOT_max_degss) * _JZZ_kgm2;
+    //float arg_F_Z_N = -1.0 * _Mass_kg * 9.8F;
+    float arg_F_Z_N = -1.731F;
 
-    // Under the motor lost condition we remove the highest motor output from our calculations and let that motor go greater than 1.0
-    // To ensure control and maximum righting performance Hex and Octo have some optimal settings that should be used
-    // Y6               : MOT_YAW_HEADROOM = 350, ATC_RAT_RLL_IMAX = 1.0,   ATC_RAT_PIT_IMAX = 1.0,   ATC_RAT_YAW_IMAX = 0.5
-    // Octo-Quad (x8) x : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.375, ATC_RAT_PIT_IMAX = 0.375, ATC_RAT_YAW_IMAX = 0.375
-    // Octo-Quad (x8) + : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.75,  ATC_RAT_PIT_IMAX = 0.75,  ATC_RAT_YAW_IMAX = 0.375
-    // Usable minimums below may result in attitude offsets when motors are lost. Hex aircraft are only marginal and must be handles with care
-    // Hex              : MOT_YAW_HEADROOM = 0,   ATC_RAT_RLL_IMAX = 1.0,   ATC_RAT_PIT_IMAX = 1.0,   ATC_RAT_YAW_IMAX = 0.5
-    // Octo-Quad (x8) x : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.25,  ATC_RAT_PIT_IMAX = 0.25,  ATC_RAT_YAW_IMAX = 0.25
-    // Octo-Quad (x8) + : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.5,   ATC_RAT_PIT_IMAX = 0.5,   ATC_RAT_YAW_IMAX = 0.25
-    // Quads cannot make use of motor loss handling because it doesn't have enough degrees of freedom.
+    hal.console->printf("\n\n Input r= %.2f, p= %.2f, y= %.2f, t= %.2f \n\n", roll_thrust, pitch_thrust, yaw_thrust, throttle_thrust);
 
+    for (r = 0; r < 20; r++) {
+        // MATLAB Function: '<S1>/MATLAB Function'
+        vcol = r << 2;
+
+        // Product: '<S1>/Matrix Multiply' incorporates:
+        //   Inport: '<Root>/F_Z_N'
+        //   Inport: '<Root>/L_NM'
+        //   Inport: '<Root>/M_NM'
+        //   Inport: '<Root>/N_NM'
+        //   MATLAB Function: '<S1>/MATLAB Function'
+
+        absx = X[vcol + 3] * arg_N_NM + (X[vcol + 2] * arg_M_NM + (X[vcol + 1] * arg_L_NM + X[vcol] * arg_F_Z_N));
+
+        // Sqrt: '<Root>/Sqrt' incorporates:
+        //   Constant: '<Root>/Constant'// float Constant_Value_h[20]; //Expression: CONTBATT.CA.W_TRIM_RPM //Referenced by: '<Root>/Constant'
+        //   Gain: '<S1>/Gain3'
+        //   Math: '<Root>/Square'
+        //   Sum: '<Root>/Sum'
+        // Expression: CONTBATT.CA.W_TRIM_RPM//  Referenced by: '<Root>/Constant'
+
+        // rtb_CTx_Lookup[r] = safe_sqrt(_Gain3_Gain * absx + _CONTBATT_CA_W_TRIM_RPM[r] * _CONTBATT_CA_W_TRIM_RPM[r]);
+        rtb_CTx_Lookup[r] = safe_sqrt(_Gain3_Gain * absx);
+    }
+
+    // SignalConversion generated from: '<Root>/RPM2PWM'
+    rtb_CTz_Lookup[0] = rtb_CTx_Lookup[7];
+    rtb_CTz_Lookup[1] = rtb_CTx_Lookup[6];
+    rtb_CTz_Lookup[2] = rtb_CTx_Lookup[5];
+    rtb_CTz_Lookup[3] = rtb_CTx_Lookup[4];
+    rtb_CTz_Lookup[4] = rtb_CTx_Lookup[0];
+    rtb_CTz_Lookup[5] = rtb_CTx_Lookup[1];
+    rtb_CTz_Lookup[6] = rtb_CTx_Lookup[2];
+    rtb_CTz_Lookup[7] = rtb_CTx_Lookup[3];
+    rtb_CTz_Lookup[8] = rtb_CTx_Lookup[13];
+    rtb_CTz_Lookup[9] = rtb_CTx_Lookup[12];
+    rtb_CTz_Lookup[10] = rtb_CTx_Lookup[11];
+    rtb_CTz_Lookup[11] = rtb_CTx_Lookup[10];
+    rtb_CTz_Lookup[12] = rtb_CTx_Lookup[9];
+    rtb_CTz_Lookup[13] = rtb_CTx_Lookup[8];
+    for (r = 0; r < 6; r++) {
+        rtb_CTz_Lookup[r + 14] = rtb_CTx_Lookup[r + 14];
+    }
+
+    // End of SignalConversion generated from: '<Root>/RPM2PWM'
+
+    // // Lookup_n-D: '<Root>/RPM2PWM'
+    // for (vcol = 0; vcol < 20; vcol++) {
+    //     CONSCALE_CON_TBATT_CONPARA_CA_Y.THROTTLE[vcol] = look1_iflf_binlxpw(rtb_CTz_Lookup[vcol], CONSCALE_CON_TBATT_CONPARA_CA_P.RPM2PWM_bp01Data, CONSCALE_CON_TBATT_CONPARA_CA_P.RPM2PWM_tableData, 10U);
+    // }
+
+    // End of Lookup_n-D: '<Root>/RPM2PWM'
+
+    
+
+    
     // calculate amount of yaw we can fit into the throttle range
     // this is always equal to or less than the requested yaw from the pilot or rate controller
     float yaw_allowed = 1.0f; // amount of yaw we can fit in
@@ -392,9 +561,14 @@ void AP_MotorsYT::output_armed_stabilizing()
 
     // add scaled roll, pitch, constrained yaw and throttle for each motor
     const float throttle_thrust_best_plus_adj = throttle_thrust_best_rpy + thr_adj;
-    for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
-        if (motor_enabled[i]) {
-            _thrust_rpyt_out[i] = (throttle_thrust_best_plus_adj * _throttle_factor[i]) + (rpy_scale * _thrust_rpyt_out[i]);
+    for (r = 0; r < AP_MOTORS_MAX_NUM_MOTORS; r++) {
+        if (motor_enabled[r]) {
+            if(throttle_thrust > _throttle_trim){
+                _thrust_rpyt_out[r] = (throttle_thrust_best_plus_adj * _throttle_factor[r]) + (rpy_scale * _thrust_rpyt_out[r]);
+                _thrust_rpyt_out[r] = constrain_float(look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U) + _thrust_trim[r] + (1-_thrust_trim[11]) * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) * (r<8?1.107F:((r==8||r==9||r==18||r==19)?1.0F:1.131F)), 0.0F, 1.0F);
+            }
+            // _thrust_rpyt_out[r] = (throttle_thrust_best_plus_adj * _throttle_factor[r]) + (rpy_scale * _thrust_rpyt_out[r]);
+            _thrust_rpyt_out[r] = constrain_float(look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U) + _thrust_trim[r] * throttle_thrust / _throttle_trim, 0.0, 1.0);
         }
     }
 
@@ -405,6 +579,203 @@ void AP_MotorsYT::output_armed_stabilizing()
     // check for failed motor
     check_for_failed_motor(throttle_thrust_best_plus_adj);
 }
+
+// // output_armed - sends commands to the motors
+// // includes new scaling stability patch
+// void AP_MotorsYT::output_armed_stabilizing()
+// {
+//     // apply voltage and air pressure compensation
+//     const float compensation_gain = thr_lin.get_compensation_gain(); // compensation for battery voltage and altitude
+
+//     // pitch thrust input value, +/- 1.0
+//     const float roll_thrust = (_roll_in + _roll_in_ff) * compensation_gain;
+
+//     // pitch thrust input value, +/- 1.0
+//     const float pitch_thrust = (_pitch_in + _pitch_in_ff) * compensation_gain;
+
+//     // yaw thrust input value, +/- 1.0
+//     float yaw_thrust = (_yaw_in + _yaw_in_ff) * compensation_gain;
+
+//     // throttle thrust input value, 0.0 - 1.0
+//     float throttle_thrust = get_throttle() * compensation_gain;
+
+//     // throttle thrust average maximum value, 0.0 - 1.0
+//     float throttle_avg_max = _throttle_avg_max * compensation_gain;
+
+//     // throttle thrust maximum value, 0.0 - 1.0, If thrust boost is active then do not limit maximum thrust
+//     const float throttle_thrust_max = boost_ratio(1.0, _throttle_thrust_max * compensation_gain);
+
+//     // sanity check throttle is above zero and below current limited throttle
+//     if (throttle_thrust <= 0.0f) {
+//         throttle_thrust = 0.0f;
+//         limit.throttle_lower = true;
+//     }
+//     if (throttle_thrust >= throttle_thrust_max) {
+//         throttle_thrust = throttle_thrust_max;
+//         limit.throttle_upper = true;
+//     }
+
+//     // ensure that throttle_avg_max is between the input throttle and the maximum throttle
+//     throttle_avg_max = constrain_float(throttle_avg_max, throttle_thrust, throttle_thrust_max);
+
+//     // throttle providing maximum roll, pitch and yaw range
+//     // calculate the highest allowed average thrust that will provide maximum control range
+//     float throttle_thrust_best_rpy = MIN(0.5f, throttle_avg_max);
+
+//     // calculate throttle that gives most possible room for yaw which is the lower of:
+//     //      1. 0.5f - (rpy_low+rpy_high)/2.0 - this would give the maximum possible margin above the highest motor and below the lowest
+//     //      2. the higher of:
+//     //            a) the pilot's throttle input
+//     //            b) the point _throttle_rpy_mix between the pilot's input throttle and hover-throttle
+//     //      Situation #2 ensure we never increase the throttle above hover throttle unless the pilot has commanded this.
+//     //      Situation #2b allows us to raise the throttle above what the pilot commanded but not so far that it would actually cause the copter to rise.
+//     //      We will choose #1 (the best throttle for yaw control) if that means reducing throttle to the motors (i.e. we favor reducing throttle *because* it provides better yaw control)
+//     //      We will choose #2 (a mix of pilot and hover throttle) only when the throttle is quite low.  We favor reducing throttle instead of better yaw control because the pilot has commanded it
+
+//     // Under the motor lost condition we remove the highest motor output from our calculations and let that motor go greater than 1.0
+//     // To ensure control and maximum righting performance Hex and Octo have some optimal settings that should be used
+//     // Y6               : MOT_YAW_HEADROOM = 350, ATC_RAT_RLL_IMAX = 1.0,   ATC_RAT_PIT_IMAX = 1.0,   ATC_RAT_YAW_IMAX = 0.5
+//     // Octo-Quad (x8) x : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.375, ATC_RAT_PIT_IMAX = 0.375, ATC_RAT_YAW_IMAX = 0.375
+//     // Octo-Quad (x8) + : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.75,  ATC_RAT_PIT_IMAX = 0.75,  ATC_RAT_YAW_IMAX = 0.375
+//     // Usable minimums below may result in attitude offsets when motors are lost. Hex aircraft are only marginal and must be handles with care
+//     // Hex              : MOT_YAW_HEADROOM = 0,   ATC_RAT_RLL_IMAX = 1.0,   ATC_RAT_PIT_IMAX = 1.0,   ATC_RAT_YAW_IMAX = 0.5
+//     // Octo-Quad (x8) x : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.25,  ATC_RAT_PIT_IMAX = 0.25,  ATC_RAT_YAW_IMAX = 0.25
+//     // Octo-Quad (x8) + : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.5,   ATC_RAT_PIT_IMAX = 0.5,   ATC_RAT_YAW_IMAX = 0.25
+//     // Quads cannot make use of motor loss handling because it doesn't have enough degrees of freedom.
+
+//     // calculate amount of yaw we can fit into the throttle range
+//     // this is always equal to or less than the requested yaw from the pilot or rate controller
+//     float yaw_allowed = 1.0f; // amount of yaw we can fit in
+//     for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+//         if (motor_enabled[i]) {
+//             // calculate the thrust outputs for roll and pitch
+//             _thrust_rpyt_out[i] = roll_thrust * _roll_factor[i] + pitch_thrust * _pitch_factor[i];
+
+//             // Check the maximum yaw control that can be used on this channel
+//             // Exclude any lost motors if thrust boost is enabled
+//             if (!is_zero(_yaw_factor[i]) && (!_thrust_boost || i != _motor_lost_index)) {
+//                 const float thrust_rp_best_throttle = throttle_thrust_best_rpy + _thrust_rpyt_out[i];
+//                 float motor_room;
+//                 if (is_positive(yaw_thrust * _yaw_factor[i])) {
+//                     // room to upper limit
+//                     motor_room = 1.0 - thrust_rp_best_throttle;
+//                 } else {
+//                     // room to lower limit
+//                     motor_room = thrust_rp_best_throttle;
+//                 }
+//                 const float motor_yaw_allowed = MAX(motor_room, 0.0)/fabsf(_yaw_factor[i]);
+//                 yaw_allowed = MIN(yaw_allowed, motor_yaw_allowed);
+//             }
+//         }
+//     }
+
+//     // calculate the maximum yaw control that can be used
+//     // todo: make _yaw_headroom 0 to 1
+//     float yaw_allowed_min = (float)_yaw_headroom * 0.001f;
+
+//     // increase yaw headroom to 50% if thrust boost enabled
+//     yaw_allowed_min = boost_ratio(0.5, yaw_allowed_min);
+
+//     // Let yaw access minimum amount of head room
+//     yaw_allowed = MAX(yaw_allowed, yaw_allowed_min);
+
+//     // Include the lost motor scaled by _thrust_boost_ratio to smoothly transition this motor in and out of the calculation
+//     if (_thrust_boost && motor_enabled[_motor_lost_index]) {
+//         // Check the maximum yaw control that can be used on this channel
+//         // Exclude any lost motors if thrust boost is enabled
+//         if (!is_zero(_yaw_factor[_motor_lost_index])){
+//             const float thrust_rp_best_throttle = throttle_thrust_best_rpy + _thrust_rpyt_out[_motor_lost_index];
+//             float motor_room;
+//             if (is_positive(yaw_thrust * _yaw_factor[_motor_lost_index])) {
+//                 motor_room = 1.0 - thrust_rp_best_throttle;
+//             } else {
+//                 motor_room = thrust_rp_best_throttle;
+//             }
+//             const float motor_yaw_allowed = MAX(motor_room, 0.0)/fabsf(_yaw_factor[_motor_lost_index]);
+//             yaw_allowed = boost_ratio(yaw_allowed, MIN(yaw_allowed, motor_yaw_allowed));
+//         }
+//     }
+
+//     if (fabsf(yaw_thrust) > yaw_allowed) {
+//         // not all commanded yaw can be used
+//         yaw_thrust = constrain_float(yaw_thrust, -yaw_allowed, yaw_allowed);
+//         limit.yaw = true;
+//     }
+
+//     // add yaw control to thrust outputs
+//     float rpy_low = 1.0f;   // lowest thrust value
+//     float rpy_high = -1.0f; // highest thrust value
+//     for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+//         if (motor_enabled[i]) {
+//             _thrust_rpyt_out[i] = _thrust_rpyt_out[i] + yaw_thrust * _yaw_factor[i];
+
+//             // record lowest roll + pitch + yaw command
+//             if (_thrust_rpyt_out[i] < rpy_low) {
+//                 rpy_low = _thrust_rpyt_out[i];
+//             }
+//             // record highest roll + pitch + yaw command
+//             // Exclude any lost motors if thrust boost is enabled
+//             if (_thrust_rpyt_out[i] > rpy_high && (!_thrust_boost || i != _motor_lost_index)) {
+//                 rpy_high = _thrust_rpyt_out[i];
+//             }
+//         }
+//     }
+//     // Include the lost motor scaled by _thrust_boost_ratio to smoothly transition this motor in and out of the calculation
+//     if (_thrust_boost) {
+//         // record highest roll + pitch + yaw command
+//         if (_thrust_rpyt_out[_motor_lost_index] > rpy_high && motor_enabled[_motor_lost_index]) {
+//             rpy_high = boost_ratio(rpy_high, _thrust_rpyt_out[_motor_lost_index]);
+//         }
+//     }
+
+//     // calculate any scaling needed to make the combined thrust outputs fit within the output range
+//     float rpy_scale = 1.0f;
+//     if (rpy_high - rpy_low > 1.0f) {
+//         rpy_scale = 1.0f / (rpy_high - rpy_low);
+//     }
+//     if (throttle_avg_max + rpy_low < 0) {
+//         rpy_scale = MIN(rpy_scale, -throttle_avg_max / rpy_low);
+//     }
+
+//     // calculate how close the motors can come to the desired throttle
+//     rpy_high *= rpy_scale;
+//     rpy_low *= rpy_scale;
+//     throttle_thrust_best_rpy = -rpy_low;
+//     float thr_adj = throttle_thrust - throttle_thrust_best_rpy;
+//     if (rpy_scale < 1.0f) {
+//         // Full range is being used by roll, pitch, and yaw.
+//         limit.roll = true;
+//         limit.pitch = true;
+//         limit.yaw = true;
+//         if (thr_adj > 0.0f) {
+//             limit.throttle_upper = true;
+//         }
+//         thr_adj = 0.0f;
+//     } else if (thr_adj < 0.0f) {
+//         // Throttle can't be reduced to desired value
+//         // todo: add lower limit flag and ensure it is handled correctly in altitude controller
+//         thr_adj = 0.0f;
+//     } else if (thr_adj > 1.0f - (throttle_thrust_best_rpy + rpy_high)) {
+//         // Throttle can't be increased to desired value
+//         thr_adj = 1.0f - (throttle_thrust_best_rpy + rpy_high);
+//         limit.throttle_upper = true;
+//     }
+
+//     // add scaled roll, pitch, constrained yaw and throttle for each motor
+//     const float throttle_thrust_best_plus_adj = throttle_thrust_best_rpy + thr_adj;
+//     for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+//         if (motor_enabled[i]) {
+//             _thrust_rpyt_out[i] = (throttle_thrust_best_plus_adj * _throttle_factor[i]) + (rpy_scale * _thrust_rpyt_out[i]);
+//         }
+//     }
+
+//     // determine throttle thrust for harmonic notch
+//     // compensation_gain can never be zero
+//     _throttle_out = throttle_thrust_best_plus_adj / compensation_gain;
+
+//     // check for failed motor
+//     check_for_failed_motor(throttle_thrust_best_plus_adj);
+// }
 
 // check for failed motor
 //   should be run immediately after output_armed_stabilizing

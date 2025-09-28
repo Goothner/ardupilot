@@ -4,18 +4,19 @@
 
 #if AP_CUSTOMCONTROL_ENABLED
 
+
 #include "AC_CustomControl_Backend.h"
 // #include "AC_CustomControl_Empty.h"
 #include "AC_CustomControl_PID.h"
+#include "AC_CustomControl_YTDT.h"
 #include <GCS_MAVLink/GCS.h>
-#include <AP_Logger/AP_Logger.h>
 
 // table of user settable parameters
 const AP_Param::GroupInfo AC_CustomControl::var_info[] = {
     // @Param: _TYPE
     // @DisplayName: Custom control type
     // @Description: Custom control type to be used
-    // @Values: 0:None, 1:Empty, 2:PID
+    // @Values: 0:None, 1:Empty, 2:PID, 3:YTDT
     // @RebootRequired: True
     // @User: Advanced
     AP_GROUPINFO_FLAGS("_TYPE", 1, AC_CustomControl, _controller_type, 0, AP_PARAM_FLAG_ENABLE),
@@ -32,6 +33,9 @@ const AP_Param::GroupInfo AC_CustomControl::var_info[] = {
 
     // parameters for PID controller
     AP_SUBGROUPVARPTR(_backend, "2_", 7, AC_CustomControl, _backend_var_info[1]),
+
+    // parameters for YTDT controller
+    AP_SUBGROUPVARPTR(_backend, "3_", 8, AC_CustomControl, _backend_var_info[2]),
 
     AP_GROUPEND
 };
@@ -55,12 +59,16 @@ void AC_CustomControl::init(void)
             break;
         case CustomControlType::CONT_EMPTY: // This is template backend. Don't initialize it.
             // This is template backend. Don't initialize it.
-            // _backend = NEW_NOTHROW AC_CustomControl_Empty(*this, _ahrs, _att_control, _motors, _dt);
+            // _backend = new AC_CustomControl_Empty(*this, _ahrs, _att_control, _motors, _dt);
             // _backend_var_info[get_type()] = AC_CustomControl_Empty::var_info;
             break;
         case CustomControlType::CONT_PID:
-            _backend = NEW_NOTHROW AC_CustomControl_PID(*this, _ahrs, _att_control, _motors, _dt);
+            _backend = new AC_CustomControl_PID(*this, _ahrs, _att_control, _motors, _dt);
             _backend_var_info[get_type()] = AC_CustomControl_PID::var_info;
+            break;
+        case CustomControlType::CONT_YTDT:
+            _backend = new AC_CustomControl_YTDT(*this, _ahrs, _att_control, _motors, _dt);
+            _backend_var_info[get_type()] = AC_CustomControl_YTDT::var_info;
             break;
         default:
             return;
@@ -123,30 +131,30 @@ void AC_CustomControl::set_custom_controller(bool enabled)
 
     // don't allow accidental main controller reset without active custom controller
     if (_controller_type == CustomControlType::CONT_NONE) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Custom controller is not enabled");
+        gcs().send_text(MAV_SEVERITY_INFO, "Custom controller is not enabled");
         return;
     }
 
     // controller type is out of range
     if (_controller_type > CUSTOMCONTROL_MAX_TYPES) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Custom controller type is out of range");
+        gcs().send_text(MAV_SEVERITY_INFO, "Custom controller type is out of range");
         return;
     }
 
     // backend is not created
     if (_backend == nullptr) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Reboot to enable selected custom controller");
+        gcs().send_text(MAV_SEVERITY_INFO, "Reboot to enable selected custom controller");
         return;
     }
 
     if (_custom_controller_mask == 0 && enabled) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Axis mask is not set");
+        gcs().send_text(MAV_SEVERITY_INFO, "Axis mask is not set");
         return;
     }
 
     // reset main controller
     if (!enabled) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Custom controller is OFF");
+        gcs().send_text(MAV_SEVERITY_INFO, "Custom controller is OFF");
         // don't reset if the empty backend is selected
         if (_controller_type > CustomControlType::CONT_EMPTY) {
             reset_main_att_controller();
@@ -156,7 +164,7 @@ void AC_CustomControl::set_custom_controller(bool enabled)
     if (enabled && _controller_type > CustomControlType::CONT_NONE) {
         // reset custom controller filter, integrator etc.
         _backend->reset();
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Custom controller is ON");
+        gcs().send_text(MAV_SEVERITY_INFO, "Custom controller is ON");
     }
 
     _custom_controller_active = enabled;
@@ -193,4 +201,4 @@ void AC_CustomControl::set_notch_sample_rate(float sample_rate)
 #endif
 }
 
-#endif  // AP_CUSTOMCONTROL_ENABLED
+#endif
