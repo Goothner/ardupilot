@@ -14,19 +14,31 @@ const AP_Param::GroupInfo AC_CustomControl_YTDT::var_info[] = {
     // @DisplayName: YTDT param1
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
-    AP_GROUPINFO("PARAM1", 1, AC_CustomControl_YTDT, param1, 0.0f),
+    AP_GROUPINFO("YT_ROL_ANG_P", 1, AC_CustomControl_YTDT, _roll_angl_err_kp, 2.0f),
 
     // @Param: PARAM2
     // @DisplayName: YTDT param2
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
-    AP_GROUPINFO("PARAM2", 2, AC_CustomControl_YTDT, param2, 0.0f),
+    AP_GROUPINFO("YT_ROL_RAT_P", 2, AC_CustomControl_YTDT, _roll_rate_err_kp, 2.2f),
 
     // @Param: PARAM3
     // @DisplayName: YTDT param3
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
-    AP_GROUPINFO("PARAM3", 3, AC_CustomControl_YTDT, param3, 0.0f),
+    AP_GROUPINFO("YT_PIT_ANG_P", 3, AC_CustomControl_YTDT, _pitch_angl_err_kp, 3.8f),
+
+    // @Param: PARAM4
+    // @DisplayName: YTDT param3
+    // @Description: Dummy parameter for YTDT custom controller backend
+    // @User: Advanced
+    AP_GROUPINFO("YT_PIT_RAT_P", 4, AC_CustomControl_YTDT, _pitch_rate_err_kp, 5.0f),
+
+    // @Param: PARAM5
+    // @DisplayName: YTDT param3
+    // @Description: Dummy parameter for YTDT custom controller backend
+    // @User: Advanced
+    AP_GROUPINFO("YT_YAW_RAT_P", 5, AC_CustomControl_YTDT, _yaw_rate_err_kp, 5.0f),
 
     AP_GROUPEND
 };
@@ -129,7 +141,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     float arg_VER_VEL_REF_K3{ 0.483558994F };
 
     // '<Root>/ROLL_ANGLE_ERR_Kp 1'
-    float arg_ROLL_ANGLE_ERR_Kp_1{ 1.0F };
+    float arg_ROLL_ANGLE_ERR_Kp_1 = _roll_angl_err_kp;
 
     // '<Root>/ROLL_ANGLE_REF_KFF'
     float arg_ROLL_ANGLE_REF_KFF{ 1.0F };
@@ -144,7 +156,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     float arg_ROLL_ANGLE_REF_K3{ 0.001F };
 
     // '<Root>/ROLL_ANGULAR_RATE_ERR_Kp '
-    float arg_ROLL_ANGULAR_RATE_ERR_Kp_{ 1.2F };
+    float arg_ROLL_ANGULAR_RATE_ERR_Kp_ = _roll_rate_err_kp;
 
     // '<Root>/ROLL_ANGUALR_RATE_REF_KFF'
     float arg_ROLL_ANGUALR_RATE_REF_KFF{ 0.0F };
@@ -153,7 +165,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     float arg_ROLL_ANGULAR_RATE_REF_K3{ 0.01F };
 
     // '<Root>/PITCH_ANGLE_ERR_Kp 2'
-    float arg_PITCH_ANGLE_ERR_Kp_2{ 4.2F };
+    float arg_PITCH_ANGLE_ERR_Kp_2 = _pitch_angl_err_kp;
 
     // '<Root>/PITCH_ANGLE_REF_KFF'
     float arg_PITCH_ANGLE_REF_KFF{ 0.0F };
@@ -168,7 +180,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     float arg_PITCH_ANGLE_REF_K3{ 0.01F };
 
     // '<Root>/PITCH_ANGULAR_RATE_ERR_Kp '
-    float arg_PITCH_ANGULAR_RATE_ERR_Kp_{ 5.0F };
+    float arg_PITCH_ANGULAR_RATE_ERR_Kp_ = _pitch_rate_err_kp;
 
     // '<Root>/PITCH_ANGULAR_RATE_REF_KFF'
     float arg_PITCH_ANGULAR_RATE_REF_KFF{ 0.0F };
@@ -177,7 +189,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     float arg_PITCH_ANGULAR_RATE_REF_K3{ 1.0F };
 
     // '<Root>/YAW_ANGULAR_RATE_ERR_Kp 2'
-    float arg_YAW_ANGULAR_RATE_ERR_Kp_2{ 2.0F };
+    float arg_YAW_ANGULAR_RATE_ERR_Kp_2 = _yaw_rate_err_kp;
 
     // '<Root>/YAW_ANGULAR_RATE_REF_KFF'
     float arg_YAW_ANGULAR_RATE_REF_KFF{ 0.0F };

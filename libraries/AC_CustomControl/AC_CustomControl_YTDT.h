@@ -24,10 +24,12 @@ public:
 
 protected:
     // declare parameters here
-    AP_Float param1;
-    AP_Float param2;
-    AP_Float param3;
-
+    AP_Float _roll_angl_err_kp;
+    AP_Float _roll_rate_err_kp;
+    AP_Float _pitch_angl_err_kp;
+    AP_Float _pitch_rate_err_kp;
+    AP_Float _yaw_rate_err_kp;
+    
     // YTscaled parameters
     float _P_DOT_max_degss = 7.0F;//7.1
     float _Q_DOT_max_degss = 19.0F;//19.2
