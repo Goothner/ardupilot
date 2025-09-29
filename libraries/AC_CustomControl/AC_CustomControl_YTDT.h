@@ -27,6 +27,11 @@ protected:
     AP_Float param1;
     AP_Float param2;
     AP_Float param3;
+
+    // YTscaled parameters
+    float _P_DOT_max_degss = 7.0F;//7.1
+    float _Q_DOT_max_degss = 19.0F;//19.2
+    float _R_DOT_max_degss = 2.23F;//2.236
 };
 
 #endif

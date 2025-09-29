@@ -185,8 +185,8 @@ private:
     void _svd(const float A[80], float U[80], float s[4], float V[16]);// void _svd(const float A[80], float U[80], float s[4], float V[16]);
 
     // YTscaled parameters
-    float _P_DOT_max_degss = 5.0F;//7.1
-    float _Q_DOT_max_degss = 16.0F;//19.2
+    float _P_DOT_max_degss = 7.0F;//7.1
+    float _Q_DOT_max_degss = 19.0F;//19.2
     float _R_DOT_max_degss = 2.23F;//2.236
     float _JXX_kgm2 = 1.3F;
     float _JYY_kgm2 = 12.94F;

@@ -67,18 +67,6 @@ Vector3f AC_CustomControl_YTDT::update(void)
      Quaternion attitude_body, attitude_target;
     _ahrs->get_quat_body_to_ned(attitude_body);
 
-    // attitude_target = _att_control->get_attitude_target_quat();
-    // This vector represents the angular error to rotate the thrust vector using x and y and heading using z
-    // Vector3f attitude_error;
-    // float _thrust_angle, _thrust_error_angle;
-    // _att_control->thrust_heading_rotation_angles(attitude_target, attitude_body, attitude_error, _thrust_angle, _thrust_error_angle);
-
-    // recalculate ang vel feedforward from attitude target model
-    // rotation from the target frame to the body frame
-    // Quaternion rotation_target_to_body = attitude_body.inverse() * attitude_target;
-    // // target angle velocity vector in the body frame
-    // Vector3f ang_vel_body_feedforward = rotation_target_to_body * _att_control->get_attitude_target_ang_vel();
-
     // '<Root>/DF_FRR_DEG'
     float arg_DF_FRR_DEG{ 30.0F };
 
@@ -103,14 +91,24 @@ Vector3f AC_CustomControl_YTDT::update(void)
     // '<Root>/H_DOT_MPS'
     float arg_H_DOT_MPS{ 0.0F };
 
+    // Return 321-intrinsic euler angles in centidegrees representing the rotation from NED earth frame to the
+    // attitude controller's target attitude.
+    // **NOTE** Using vector3f*deg(100) is more efficient than deg(vector3f)*100 or deg(vector3d*100) because it gives the
+    // same result with the fewest multiplications. Even though it may look like a bug, it is intentional. See issue 4895.
+        // Vector3f get_att_target_euler_cd() const { return _euler_angle_target * degrees(100.0f); }
+        // const Vector3f & get_att_target_euler_rad() const { return _euler_angle_target; }
+
+    // return the angular velocity of the target (setpoint) attitude rad/s
+        // const Vector3f& get_rate_ef_targets() const { return _euler_rate_target; }
+
     // '<Root>/ROLL_ATT_CMD_DEG'
-    float arg_ROLL_ATT_CMD_DEG{ _att_control->get_att_target_euler_cd().x/4500.0F};
+    float arg_ROLL_ATT_CMD_DEG{ _att_control->get_att_target_euler_cd().x/100.0F};
 
     // '<Root>/PITCH_ATT_CMD_DEG'
-    float arg_PITCH_ATT_CMD_DEG{ _att_control->get_att_target_euler_cd().y/4500.0F};
+    float arg_PITCH_ATT_CMD_DEG{ _att_control->get_att_target_euler_cd().y/100.0F};
 
     // '<Root>/YAW_RATE_CMD_DEGPS'
-    float arg_YAW_RATE_CMD_DEGPS{ _att_control->get_att_target_euler_cd().z/4500.0F };
+    float arg_YAW_RATE_CMD_DEGPS{ degrees(_att_control->get_rate_ef_targets().z)};
 
     // '<Root>/HDOT_CMD_MPS'
     float arg_HDOT_CMD_MPS{ 0.0F };
@@ -228,17 +226,20 @@ Vector3f AC_CustomControl_YTDT::update(void)
     &arg_YAW_ANGULAR_RATE_REF_K3, arg_DF_FRR_DEGLIN, arg_P_DOT_CMD,
     arg_Q_DOT_CMD, arg_R_DOT_CMD, arg_G_B_MPS2);
 
-    float P_DOT_max_degss = 3.5F;
-    float Q_DOT_max_degss = 5.0F;
-    float R_DOT_max_degss = 0.15F;
+    // YTscaled parameters
+    // float _P_DOT_max_degss = 7.0F;//7.1
+    // float _Q_DOT_max_degss = 19.0F;//19.2
+    // float _R_DOT_max_degss = 2.23F;//2.236
 
     //
-    gcs().send_text(MAV_SEVERITY_INFO, "YTDT controller working");
+    //gcs().send_text(MAV_SEVERITY_INFO, "YTDT controller working");
+    //gcs().send_text(MAV_SEVERITY_INFO, "get_dt = %.4f ", _att_control->get_dt());
+    gcs().send_text(MAV_SEVERITY_INFO, "YT-10:33 input deg: R= %.2f,P= %.2f,Y= %.2f ",arg_ROLL_ATT_CMD_DEG, arg_PITCH_ATT_CMD_DEG, arg_YAW_RATE_CMD_DEGPS);
     //hal.console->printf("\n\n NFCY test! %.2f \n\n", 1.234f);
     //hal.console->printf("\n\n NFCY test! %.2f \n\n", nfcytest)
 
     // return what arducopter main controller outputted
-    return Vector3f(constrain_float(arg_P_DOT_CMD/P_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_R_DOT_CMD/Q_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_G_B_MPS2/R_DOT_max_degss, -1.0F, 1.0F));
+    return Vector3f(constrain_float(arg_P_DOT_CMD/_P_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_R_DOT_CMD/_Q_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_G_B_MPS2/_R_DOT_max_degss, -1.0F, 1.0F));
 }
 
 // reset controller to avoid build up on the ground

@@ -146,13 +146,14 @@ class Board:
 
         # allow enable of custom controller for any board
         # enabled on sitl by default
-        if (cfg.options.enable_custom_controller or self.get_name() == "sitl") and not cfg.options.no_gcs:
+        if 1:##(cfg.options.enable_custom_controller or self.get_name() == "sitl") and not cfg.options.no_gcs:
             env.ENABLE_CUSTOM_CONTROLLER = True
             env.DEFINES.update(
                 AP_CUSTOMCONTROL_ENABLED=1,
             )
             env.AP_LIBRARIES += [
-                'AC_CustomControl'
+                'AC_CustomControl',
+                'AC_YTDT'
             ]
             cfg.msg("Enabled custom controller", 'yes')
         else:
