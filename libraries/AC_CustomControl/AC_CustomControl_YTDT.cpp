@@ -38,7 +38,7 @@ const AP_Param::GroupInfo AC_CustomControl_YTDT::var_info[] = {
     // @DisplayName: YTDT param3
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
-    AP_GROUPINFO("YT_YAW_RAT_P", 5, AC_CustomControl_YTDT, _yaw_rate_err_kp, 5.0f),
+    AP_GROUPINFO("YT_YAW_RAT_P", 5, AC_CustomControl_YTDT, _yaw_rate_err_kp, 1.5f),
 
     AP_GROUPEND
 };

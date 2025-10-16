@@ -195,12 +195,14 @@ private:
 
     float _DF_DEG_Value[20] { 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
     10.0F, 10.0F, 0.0F, 0.0F, 0.0F, 0.0F, 10.0F, 10.0F };
+    // float _DF_DEG_Value[20] { 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F,
+    //      10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F };
     float _CTx_Lookup_bp01Data[2] { 0.0F, 10.0F };
-    float _CTx_Lookup_tableData[2] { 0.04258F, 0.2194F };
+    float _CTx_Lookup_tableData[2] { 0.0426F, 0.1824F };
     float _CTz_Lookup_bp01Data[2] { 0.0F, 10.0F };
-    float _CTz_Lookup_tableData[2] { 0.4655F, 0.4598F };
+    float _CTz_Lookup_tableData[2] { 0.4655F, 0.4392F };
     float _CQ_Lookup_bp01Data[2] { 0.0F, 10.0F };
-    float _CQ_Lookup_tableData[2]{ 0.0123685F, 0.0123685F };
+    float _CQ_Lookup_tableData[2]{ 0.0116F, 0.0116F };
     float _vehicle_DUCT_RotDir[20] { 1.0F, -1.0F, 1.0F, -1.0F, -1.0F, 1.0F, -1.0F, 1.0F, 1.0F, -1.0F, 1.0F, -1.0F,
     1.0F, -1.0F, -1.0F, 1.0F, -1.0F, 1.0F, -1.0F, 1.0F };
     float _vehicle_DUCT_LeverArm_m[60]{ 0.527F, 0.176F, 0.0F, 0.527F, 0.251F, 0.0F, 0.527F, 0.326F, 0.0F, 0.527F,
