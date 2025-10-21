@@ -201,9 +201,9 @@ public:
         // k_motor22               = 166,
         // k_motor23               = 167,
         // k_motor24               = 168,
-        k_motor22               = 157,
-        k_motor23               = 158,
-        k_motor24               = 159,
+        k_motor23               = 157,
+        k_motor24               = 158,
+        k_motor25               = 159,
         k_motor13               = 160,
         k_motor14               = 161,
         k_motor15               = 162,
@@ -213,6 +213,8 @@ public:
         k_motor19               = 166,
         k_motor20               = 167,
         k_motor21               = 168,
+        k_motor22               = 169,
+
         k_nr_aux_servo_functions         ///< This must be the last enum value (only add new values _before_ this one)
     } Aux_servo_function_t;
 
@@ -572,11 +574,11 @@ public:
         // else {
         //     return SRV_Channel::Aux_servo_function_t((SRV_Channel::k_motor16+(channel-15)));
         // }
-        else if (channel < 21){
+        else if (channel < 22){
             return SRV_Channel::Aux_servo_function_t((SRV_Channel::k_motor13+(channel-12)));
         }
         else {
-            return SRV_Channel::Aux_servo_function_t((SRV_Channel::k_motor22+(channel-21)));
+            return SRV_Channel::Aux_servo_function_t((SRV_Channel::k_motor23+(channel-22)));
         }
     }
 

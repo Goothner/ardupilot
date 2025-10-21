@@ -105,6 +105,8 @@ void AP_Motors::set_radio_passthrough(float roll_input, float pitch_input, float
 void AP_Motors::rc_write(uint8_t chan, uint16_t pwm)
 {
     SRV_Channel::Aux_servo_function_t function = SRV_Channels::get_motor_function(chan);
+    //if(chan == 20) hal.console->printf("\n\n chan %.u onto function %.d\n\n", chan, (int)function);
+    //if(chan == 21) hal.console->printf("\n\n chan %.u onto function %.d\n\n", chan, (int)function);
     if ((1U<<chan) & _motor_pwm_scaled.mask) {
         // note that PWM_MIN/MAX has been forced to 1000/2000
         SRV_Channels::set_output_scaled(function, float(pwm) - _motor_pwm_scaled.offset);

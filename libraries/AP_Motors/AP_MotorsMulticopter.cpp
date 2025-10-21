@@ -802,12 +802,13 @@ bool AP_MotorsMulticopter::arming_checks(size_t buflen, char *buffer) const
 
     // Check output function is setup for each motor
     for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        
         if (!motor_enabled[i]) {
             continue;
         }
         uint8_t chan;
         SRV_Channel::Aux_servo_function_t function = SRV_Channels::get_motor_function(i);
-        hal.console->printf("\n\n m Channel %u assigned to function %u\n\n", i+1, (int)function);
+        //hal.console->printf("\n\n mm Channel %u assigned to function %u\n\n", i+1, (int)function);
         if (!SRV_Channels::find_channel(function, chan)) {
             hal.util->snprintf(buffer, buflen, "no SERVOx_FUNCTION set to Motor%u", i + 1);
             return false;

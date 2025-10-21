@@ -307,7 +307,7 @@ bool SRV_Channel::is_motor(SRV_Channel::Aux_servo_function_t function)
 {
     return ((function >= SRV_Channel::k_motor1 && function <= SRV_Channel::k_motor8) ||
             (function >= SRV_Channel::k_motor9 && function <= SRV_Channel::k_motor12)||
-            (function >= SRV_Channel::k_motor13 && function <= SRV_Channel::k_motor20));
+            (function >= SRV_Channel::k_motor13 && function <= SRV_Channel::k_motor22));
 }
 
 // return true if function is for anything that should be stopped in a e-stop situation, ie is dangerous
@@ -341,6 +341,8 @@ bool SRV_Channel::should_e_stop(SRV_Channel::Aux_servo_function_t function)
     case Aux_servo_function_t::k_motor18:
     case Aux_servo_function_t::k_motor19:
     case Aux_servo_function_t::k_motor20:
+    case Aux_servo_function_t::k_motor21:
+    case Aux_servo_function_t::k_motor22:
     case Aux_servo_function_t::k_engine_run_enable:
         return true;
     default:
@@ -389,12 +391,12 @@ int8_t SRV_Channel::get_motor_num(void) const
         return int8_t(uint16_t(k_function) - k_motor1);
     case k_motor9 ... k_motor12:
         return 8 + int8_t(uint16_t(k_function) - k_motor9);
-    case k_motor13 ... k_motor21:
+    case k_motor13 ... k_motor22:
         return 12 + int8_t(uint16_t(k_function) - k_motor13);
     // case k_motor18 ... k_motor20:
     //     return 15 + int8_t(uint16_t(k_function) - k_motor18);
-    case k_motor22 ... k_motor24:
-        return 21 + int8_t(uint16_t(k_function) - k_motor22);
+    case k_motor23 ... k_motor25:
+        return 22 + int8_t(uint16_t(k_function) - k_motor23);
     default:
         break;
     }
