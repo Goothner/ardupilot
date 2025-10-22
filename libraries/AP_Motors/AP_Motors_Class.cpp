@@ -108,8 +108,10 @@ void AP_Motors::rc_write(uint8_t chan, uint16_t pwm)
     if ((1U<<chan) & _motor_pwm_scaled.mask) {
         // note that PWM_MIN/MAX has been forced to 1000/2000
         SRV_Channels::set_output_scaled(function, float(pwm) - _motor_pwm_scaled.offset);
+        //if(chan==19) hal.console->printf("\n\n rc_write2 chan= %u, pwm= %u \n\n", chan+1, pwm);
     } else {
         SRV_Channels::set_output_pwm(function, pwm);
+        //if(chan==19) hal.console->printf("\n\n rc_write3 chan= %u, fucntion= %d, pwm= %u \n\n", chan+1, (int)function, pwm);
     }
 }
 

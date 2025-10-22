@@ -807,7 +807,7 @@ bool AP_MotorsMulticopter::arming_checks(size_t buflen, char *buffer) const
         }
         uint8_t chan;
         SRV_Channel::Aux_servo_function_t function = SRV_Channels::get_motor_function(i);
-        hal.console->printf("\n\n m Channel %u assigned to function %u\n\n", i+1, (int)function);
+        //hal.console->printf("\n\n m Channel %u assigned to function %u\n\n", i+1, (int)function);
         if (!SRV_Channels::find_channel(function, chan)) {
             hal.util->snprintf(buffer, buflen, "no SERVOx_FUNCTION set to Motor%u", i + 1);
             return false;

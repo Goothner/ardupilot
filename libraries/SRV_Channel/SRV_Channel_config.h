@@ -8,8 +8,8 @@
 
 #ifndef NUM_SERVO_CHANNELS
     #if BOARD_FLASH_SIZE > 1024
-        #define NUM_SERVO_CHANNELS 24
+        #define NUM_SERVO_CHANNELS 32
     #else
-        #define NUM_SERVO_CHANNELS 16
+        #define NUM_SERVO_CHANNELS 24
     #endif
 #endif

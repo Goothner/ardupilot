@@ -180,6 +180,8 @@ void AP_MotorsYT::output_to_motors()
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {
             rc_write(i, output_to_pwm(_actuator[i]));
+            //if(i==19) hal.console->printf("\n\n rc_write chan= %d, pwm= %d \n\n", i+1, output_to_pwm(_actuator[i]));
+
         }
     }
 }
@@ -384,7 +386,7 @@ void AP_MotorsYT::output_armed_stabilizing()
     //float arg_F_Z_N = -1.0 * _Mass_kg * 9.8F;
     float arg_F_Z_N = -1.731F;
 
-    hal.console->printf("\n\n Input r= %.2f, p= %.2f, y= %.2f, t= %.2f \n\n", roll_thrust, pitch_thrust, yaw_thrust, throttle_thrust);
+    //hal.console->printf("\n\n Input r= %.2f, p= %.2f, y= %.2f, t= %.2f \n\n", roll_thrust, pitch_thrust, yaw_thrust, throttle_thrust);
 
     for (r = 0; r < 20; r++) {
         // MATLAB Function: '<S1>/MATLAB Function'

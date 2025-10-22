@@ -1266,6 +1266,7 @@ bool RCOutput::get_output_mode_banner(char banner_msg[], uint8_t banner_msg_len)
 
     // create array of each channel's mode
     output_mode ch_mode[chan_offset + NUM_GROUPS * ARRAY_SIZE(pwm_group::chan)] = {};
+    //output_mode ch_mode[chan_offset + 20] = {};
     bool have_nonzero_modes = false;
 
 #if HAL_WITH_IO_MCU
@@ -1310,7 +1311,7 @@ bool RCOutput::get_output_mode_banner(char banner_msg[], uint8_t banner_msg_len)
     }
 
     // write banner to banner_msg
-    hal.util->snprintf(banner_msg, banner_msg_len, "RCOut:");
+    hal.util->snprintf(banner_msg, banner_msg_len, "RCOutput:");
     uint8_t curr_mode_lowest_ch = 0;
     for (uint8_t k = 1; k < ARRAY_SIZE(ch_mode); k++) {
         if (ch_mode[k-1] != ch_mode[k]) {

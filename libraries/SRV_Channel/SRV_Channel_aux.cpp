@@ -96,6 +96,7 @@ void SRV_Channel::output_ch(void)
     }
 #endif // HAL_BUILD_AP_PERIPH
 
+    //if(ch_num==19)hal.console->printf("\n\n output_ch chan= %u, pwm= %u \n\n", ch_num+1, output_pwm);
     if (!(SRV_Channels::disabled_mask & (1U<<ch_num))) {
         hal.rcout->write(ch_num, output_pwm);
     }
@@ -246,8 +247,10 @@ void SRV_Channels::enable_aux_servos()
     for (uint8_t i = 0; i < NUM_SERVO_CHANNELS; i++) {
         SRV_Channel &c = channels[i];
         // see if it is a valid function
+        //if(i==19)hal.console->printf("\n\n enable_aux_servos chan= %d, result= %d \n\n", (int)(i+1), (int)(c.valid_function() && !(disabled_mask & (1U<<c.ch_num))) );
         if (c.valid_function() && !(disabled_mask & (1U<<c.ch_num))) {
             hal.rcout->enable_ch(c.ch_num);
+            //hal.console->printf("\n\n enable_ch chan= %d \n\n", (int)(c.ch_num) );
         } else {
             hal.rcout->disable_ch(c.ch_num);
         }
@@ -327,6 +330,7 @@ void SRV_Channels::set_digital_outputs(uint32_t dig_mask, uint32_t rev_mask) {
 void SRV_Channels::enable_by_mask(uint32_t mask)
 {
     for (uint8_t i = 0; i < NUM_SERVO_CHANNELS; i++) {
+        if(i==19)hal.console->printf("\n\n enable_by_mask mask= %d, result= %d \n\n", (int)mask, (int)(mask & (1U<<i)) );
         if (mask & (1U<<i)) {
             hal.rcout->enable_ch(i);
         }
@@ -339,12 +343,14 @@ void SRV_Channels::enable_by_mask(uint32_t mask)
 void SRV_Channels::set_output_pwm(SRV_Channel::Aux_servo_function_t function, uint16_t value)
 {
     if (!function_assigned(function)) {
+        if((int)function==167) hal.console->printf("\n\n function_not_assigned chan= %u, fucntion= %d, pwm= %u \n\n", 20, (int)function, value);
         return;
     }
     for (uint8_t i = 0; i < NUM_SERVO_CHANNELS; i++) {
         if (channels[i].function == function) {
             channels[i].set_output_pwm(value);
             channels[i].output_ch();
+            //if((int)function==167) hal.console->printf("\n\n function_assigned chan= %u, fucntion= %d, pwm= %u \n\n", 20, (int)function, value);
         }
     }
 }
