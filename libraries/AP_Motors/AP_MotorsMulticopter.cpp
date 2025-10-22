@@ -802,7 +802,6 @@ bool AP_MotorsMulticopter::arming_checks(size_t buflen, char *buffer) const
 
     // Check output function is setup for each motor
     for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
-        
         if (!motor_enabled[i]) {
             continue;
         }
