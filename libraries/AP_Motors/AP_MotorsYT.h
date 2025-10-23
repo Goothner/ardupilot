@@ -166,63 +166,118 @@ private:
     bool setup_yt_matrix(motor_frame_type frame_type);
 
     // YTMath functions
+    //void diag(const float *v, float *d);
     float look1_iflf_binlxpw(float u0, const float bp0[], const float table[], uint32_t maxIndex);
-    float xnrm2(int32_t n, const float *x, int32_t ix0);//float xnrm2(int32_t n, const float x[80], int32_t ix0);
-    float xnrm2_j(int32_t n, const float *x, int32_t ix0);//float xnrm2_j(int32_t n, const float x[4], int32_t ix0);
-    void xaxpy_m0(int32_t n, float a, const float *x, int32_t ix0, float *y, int32_t iy0);//void xaxpy_m0(int32_t n, float a, const float x[20], int32_t ix0, float y[80], int32_t iy0);
-    void xaxpy_m(int32_t n, float a, const float *x, int32_t ix0, float *y, int32_t iy0);//void AP_MotorsYT::xaxpy_m(int32_t n, float a, const float x[80], int32_t ix0, float y[20], int32_t iy0)
-    float xdotc(int32_t n, const float x[80], int32_t ix0, const float y[80], int32_t iy0);//float xdotc(int32_t n, const float x[80], int32_t ix0, const float y[80], int32_t iy0);
-    void xaxpy(int32_t n, float a, int32_t ix0, float y[80], int32_t iy0);//void xaxpy(int32_t n, float a, int32_t ix0, float y[80], int32_t iy0);
-    float xdotc_e(int32_t n, const float x[16], int32_t ix0,const float y[16], int32_t iy0);//float xdotc_e(int32_t n, const float x[16], int32_t ix0,const float y[16], int32_t iy0);
-    void xaxpy_m0a(int32_t n, float a, int32_t ix0, float y[16], int32_t iy0);//void xaxpy_m0a(int32_t n, float a, int32_t ix0, float y[16], int32_t iy0);
-    void xscal(float a, float x[80], int32_t ix0);//void xscal(float a, float x[80], int32_t ix0);
-    void xscal_c(float a, float x[16], int32_t ix0);//void xscal_c(float a, float x[16], int32_t ix0);
-    void xswap(float x[16], int32_t ix0, int32_t iy0);//void xswap(float x[16], int32_t ix0, int32_t iy0);
-    void xswap_m(float x[80], int32_t ix0, int32_t iy0);//void xswap_m(float x[80], int32_t ix0, int32_t iy0);
-    void xrotg(float *a, float *b, float *c, float *s);
-    void xrot(float x[16], int32_t ix0, int32_t iy0, float c, float s);//void xrot(float x[16], int32_t ix0, int32_t iy0, float c, float s);
-    void xrot_f(float x[80], int32_t ix0, int32_t iy0, float c, float s);//void xrot_f(float x[80], int32_t ix0, int32_t iy0, float c, float s);
-    void _svd(const float A[80], float U[80], float s[4], float V[16]);// void _svd(const float A[80], float U[80], float s[4], float V[16]);
+    void mldivide(const float *A, float *B);
+    void xgetrf(float *A, int *ipiv, int *info);
+    // float xnrm2(int32_t n, const float *x, int32_t ix0);//float xnrm2(int32_t n, const float x[80], int32_t ix0);
+    // float xnrm2_j(int32_t n, const float *x, int32_t ix0);//float xnrm2_j(int32_t n, const float x[4], int32_t ix0);
+    // void xaxpy_m0(int32_t n, float a, const float *x, int32_t ix0, float *y, int32_t iy0);//void xaxpy_m0(int32_t n, float a, const float x[20], int32_t ix0, float y[80], int32_t iy0);
+    // void xaxpy_m(int32_t n, float a, const float *x, int32_t ix0, float *y, int32_t iy0);//void AP_MotorsYT::xaxpy_m(int32_t n, float a, const float x[80], int32_t ix0, float y[20], int32_t iy0)
+    // float xdotc(int32_t n, const float x[80], int32_t ix0, const float y[80], int32_t iy0);//float xdotc(int32_t n, const float x[80], int32_t ix0, const float y[80], int32_t iy0);
+    // void xaxpy(int32_t n, float a, int32_t ix0, float y[80], int32_t iy0);//void xaxpy(int32_t n, float a, int32_t ix0, float y[80], int32_t iy0);
+    // float xdotc_e(int32_t n, const float x[16], int32_t ix0,const float y[16], int32_t iy0);//float xdotc_e(int32_t n, const float x[16], int32_t ix0,const float y[16], int32_t iy0);
+    // void xaxpy_m0a(int32_t n, float a, int32_t ix0, float y[16], int32_t iy0);//void xaxpy_m0a(int32_t n, float a, int32_t ix0, float y[16], int32_t iy0);
+    // void xscal(float a, float x[80], int32_t ix0);//void xscal(float a, float x[80], int32_t ix0);
+    // void xscal_c(float a, float x[16], int32_t ix0);//void xscal_c(float a, float x[16], int32_t ix0);
+    // void xswap(float x[16], int32_t ix0, int32_t iy0);//void xswap(float x[16], int32_t ix0, int32_t iy0);
+    // void xswap_m(float x[80], int32_t ix0, int32_t iy0);//void xswap_m(float x[80], int32_t ix0, int32_t iy0);
+    // void xrotg(float *a, float *b, float *c, float *s);
+    // void xrot(float x[16], int32_t ix0, int32_t iy0, float c, float s);//void xrot(float x[16], int32_t ix0, int32_t iy0, float c, float s);
+    // void xrot_f(float x[80], int32_t ix0, int32_t iy0, float c, float s);//void xrot_f(float x[80], int32_t ix0, int32_t iy0, float c, float s);
+    // void _svd(const float A[80], float U[80], float s[4], float V[16]);// void _svd(const float A[80], float U[80], float s[4], float V[16]);
 
     // YTscaled parameters
-    float _P_DOT_max_degss = 7.0F;//7.1
-    float _Q_DOT_max_degss = 19.0F;//19.2
-    float _R_DOT_max_degss = 2.23F;//2.236
-    float _JXX_kgm2 = 1.3F;
-    float _JYY_kgm2 = 12.94F;
-    float _JZZ_kgm2 = 11.64F;
-    float _Mass_kg = 12.9;
+    const float _P_DOT_max_degss = 7.0F;//7.1
+    const float _Q_DOT_max_degss = 19.0F;//19.2
+    const float _R_DOT_max_degss = 12.23F;//2.236
+    const float _JXX_kgm2 = 1.3F;
+    const float _JYY_kgm2 = 12.94F;
+    const float _JZZ_kgm2 = 11.64F;
+    const float _Mass_kg = 12.9;
 
-    float _DF_DEG_Value[20] { 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
-    10.0F, 10.0F, 0.0F, 0.0F, 0.0F, 0.0F, 10.0F, 10.0F };
+    const float _DF_DEG_Value[22] {               30.0F, 30.0F, 30.0F, 30.0F, 180.0F, 
+        30.0F, 30.0F, 30.0F, 30.0F, 180.0F,
+                                            30.0F, 30.0F, 30.0F, 30.0F, 30.0F, 30.0F, 
+    30.0F, 30.0F, 30.0F, 30.0F, 30.0F, 30.0F };
+
     // float _DF_DEG_Value[20] { 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F,
     //      10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F, 10.0F };
-    float _CTx_Lookup_bp01Data[2] { 0.0F, 10.0F };
-    float _CTx_Lookup_tableData[2] { 0.0426F, 0.1824F };
-    float _CTz_Lookup_bp01Data[2] { 0.0F, 10.0F };
-    float _CTz_Lookup_tableData[2] { 0.4655F, 0.4392F };
-    float _CQ_Lookup_bp01Data[2] { 0.0F, 10.0F };
-    float _CQ_Lookup_tableData[2]{ 0.0116F, 0.0116F };
-    float _vehicle_DUCT_RotDir[20] { 1.0F, -1.0F, 1.0F, -1.0F, -1.0F, 1.0F, -1.0F, 1.0F, 1.0F, -1.0F, 1.0F, -1.0F,
-    1.0F, -1.0F, -1.0F, 1.0F, -1.0F, 1.0F, -1.0F, 1.0F };
-    float _vehicle_DUCT_LeverArm_m[60]{ 0.527F, 0.176F, 0.0F, 0.527F, 0.251F, 0.0F, 0.527F, 0.326F, 0.0F, 0.527F,
-    0.401F, 0.0F, 0.527F, -0.176F, 0.0F, 0.527F, -0.251F, 0.0F, 0.527F, -0.326F,
-    0.0F, 0.527F, -0.401F, 0.0F, -0.263F, 0.125F, 0.0F, -0.263F, 0.2F, 0.0F,
-    -0.263F, 0.275F, 0.0F, -0.263F, 0.35F, 0.0F, -0.263F, 0.425F, 0.0F, -0.263F,
-    0.5F, 0.0F, -0.263F, -0.125F, 0.0F, -0.263F, -0.2F, 0.0F, -0.263F, -0.275F,
-    0.0F, -0.263F, -0.35F, 0.0F, -0.263F, -0.425F, 0.0F, -0.263F, -0.5F, 0.0F };
-    float _Gain3_Gain = 1.0E+8F;
-    float _CONTBATT_CA_W_TRIM_RPM[20] { 32200.0F, 32200.0F, 32200.0F, 32200.0F, 32200.0F, 32200.0F, 32200.0F,
-    32200.0F, 38600.0F, 38600.0F, 38600.0F, 38600.0F, 34500.0F, 34500.0F,
-    38600.0F, 38600.0F, 38600.0F, 38600.0F, 34500.0F, 34500.0F };
-    float _thrust_trim [20] { 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 
+    const float _CTx_Lookup_bp01Data[4]   // Computed Parameter: CTx_Lookup_bp01Data
+                                    //  Referenced by: '<S1>/CTx_Lookup'
+                                     { 0.0F, 30.0F, 40.0F, 180.0F };
+    const float _CTx_Lookup_tableData[4]  // Computed Parameter: CTx_Lookup_tableData
+                                    //  Referenced by: '<S1>/CTx_Lookup'
+                                    { 0.1824F, 0.04253F, -0.1824F, -0.627F };
+    const float _CTz_Lookup_bp01Data[4]   // Computed Parameter: CTz_Lookup_bp01Data
+                                    //  Referenced by: '<S1>/CTz_Lookup'
+                                    { 0.0F, 30.0F, 40.0F, 180.0F };
+    const float _CTz_Lookup_tableData[4]  // Computed Parameter: CTz_Lookup_tableData
+                                    //  Referenced by: '<S1>/CTz_Lookup'
+                                    { 0.4392F, 0.4661F, 0.4392F, 0.0F };
+    const float _CQ_Lookup_bp01Data[4]    // Computed Parameter: CQ_Lookup_bp01Data
+                                    //  Referenced by: '<S1>/CQ_Lookup'
+                                    { 0.0F, 30.0F, 40.0F, 180.0F };
+    const float _CQ_Lookup_tableData[4]   // Computed Parameter: CQ_Lookup_tableData
+                                    //  Referenced by: '<S1>/CQ_Lookup'
+                                    { 0.01164F, 0.01356F, 0.01164F, 0.01164F };
+    const float _vehicle_DUCT_RotDir[22] { 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
+        -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 };
+    const float _vehicle_DUCT_LeverArm_m[66]{ 0.443, 0.176, 0.0, 0.443, 0.251, 0.0, 0.443, 0.326, 0.0, 0.443, 0.401,
+        0.0, 0.443, 0.47600000000000003, 0.0, 0.443, -0.176, 0.0, 0.443, -0.251,
+        0.0, 0.443, -0.326, 0.0, 0.443, -0.401, 0.0, 0.443, -0.47600000000000003,
+        0.0, -0.34700000000000003, 0.125, -0.08, -0.34700000000000003, 0.2,
+        -0.08, -0.34700000000000003, 0.275, -0.08, -0.34700000000000003,
+        0.35000000000000003, -0.08, -0.34700000000000003, 0.425, -0.08,
+        -0.34700000000000003, 0.5, -0.08, -0.34700000000000003, -0.125, -0.08,
+        -0.34700000000000003, -0.2, -0.08, -0.34700000000000003, -0.275, -0.08,
+        -0.34700000000000003, -0.35000000000000003, -0.08, -0.34700000000000003,
+        -0.425, -0.08, -0.34700000000000003, -0.5, -0.08 };
+    const float _Gain3_Gain = 1.0E+8F;
+    const float _W_TRIM_RPM[22] { 37920.7656F, 37920.7656F, 37920.7656F, 37920.7656F, 29631.0078F, 37920.7656F,
+    37920.7656F, 37920.7656F, 37920.7656F, 29631.0078F, 34621.6641F, 34621.6641F,
+    34621.6641F, 34621.6641F, 34621.6641F, 34621.6641F, 34621.6641F, 34621.6641F,
+    34621.6641F, 34621.6641F, 34621.6641F, 34621.6641F }; 
+    const float _thrust_trim [20] { 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 
         0.6833F, 0.6833F, 0.8018F, 0.8018F, 0.8018F, 0.8018F,
         0.8018F, 0.8018F, 0.8018F, 0.8018F, 0.6833F, 0.6833F };
-    float _throttle_trim = 0.5;
-    float _RPM2PWM_tableData[11] { 0.0F, 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F, 0.9F, 1.0F };
+    const float _throttle_trim = 0.5;
+    const float _RPM2PWM_tableData[11]    // Computed Parameter: RPM2PWM_tableData
+                                    //  Referenced by: '<Root>/RPM2PWM'
+    { 0.0F, 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F, 0.9F, 1.0F };
 
-    float _RPM2PWM_bp01Data[11]{ 0.0F, 9021.5F, 14953.5F, 19127.0F, 23068.5F, 26649.0F, 31687.5F, 35064.5F,
+    const float _RPM2PWM_bp01Data[11]     // Computed Parameter: RPM2PWM_bp01Data
+                                    //  Referenced by: '<Root>/RPM2PWM'
+    { 0.0F, 9021.5F, 14953.5F, 19127.0F, 23068.5F, 26649.0F, 31687.5F, 35064.5F,
     38347.5F, 41460.5F, 43682.0F };
+    const float _weight[22]  { 1.0F, 1.0F, 1.0F, 1.0F, 2.5F, 1.0F, 1.0F, 1.0F, 1.0F, 2.5F,
+        1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F };
+
+    const float _weight_diag[484]   {1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 2.5F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 2.5F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F,
+                                    0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F,
+                                };
+    float _B_0[484];
+    float _B_1[484];//copy of _B_0
 
     static AP_MotorsYT *_singleton;
 };
