@@ -330,7 +330,7 @@ void SRV_Channels::set_digital_outputs(uint32_t dig_mask, uint32_t rev_mask) {
 void SRV_Channels::enable_by_mask(uint32_t mask)
 {
     for (uint8_t i = 0; i < NUM_SERVO_CHANNELS; i++) {
-        if(i==19)hal.console->printf("\n\n enable_by_mask mask= %d, result= %d \n\n", (int)mask, (int)(mask & (1U<<i)) );
+        //if(i==19)hal.console->printf("\n\n enable_by_mask mask= %d, result= %d \n\n", (int)mask, (int)(mask & (1U<<i)) );
         if (mask & (1U<<i)) {
             hal.rcout->enable_ch(i);
         }

@@ -14,7 +14,7 @@
 //
 #include "CONSCALE_CON_TBATT_CONPARA_VECTOR.h"
 #include "rtwtypes.h"
-#include <cmath>
+
 
 static void rate_scheduler(CONFULL_CON_TBATT_CONPARA_VECTORModelClass::
   RT_MODEL_CONSCALE_CON_TBATT_C_T *const CONSCALE_CON_TBATT_CONPARA_V_M);

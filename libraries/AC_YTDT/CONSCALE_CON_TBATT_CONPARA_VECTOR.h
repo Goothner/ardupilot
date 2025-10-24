@@ -17,6 +17,7 @@
 #include "rtwtypes.h"
 #include "CONSCALE_CON_TBATT_CONPARA_VECTOR_types.h"
 #include <cstring>
+#include <cmath>
 #include "rt_defines.h"
 
 // Macros for accessing real-time model data structure
