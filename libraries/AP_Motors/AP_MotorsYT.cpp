@@ -402,7 +402,8 @@ void AP_MotorsYT::output_armed_stabilizing()
             //   Sum: '<Root>/Sum'
 
             
-            rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] * (throttle_thrust/_throttle_trim));
+            //rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] * (throttle_thrust/_throttle_trim));
+            rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0]);
         }
     }
     else//throttle_thrust > _throttle_trim
@@ -603,8 +604,13 @@ void AP_MotorsYT::output_armed_stabilizing()
     const float throttle_thrust_best_plus_adj = throttle_thrust_best_rpy + thr_adj;
     for (uint8_t r = 0; r < AP_MOTORS_MAX_NUM_MOTORS; r++) {
         if (motor_enabled[r]) {
-            _thrust_rpyt_out[r] = (throttle_thrust_best_plus_adj * _throttle_factor[r]) + (rpy_scale * _thrust_rpyt_out[r]);
-            _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
+            if(throttle_thrust < _throttle_trim){
+                _thrust_rpyt_out[r] = (throttle_thrust_best_plus_adj * _throttle_factor[r]) + (rpy_scale * _thrust_rpyt_out[r]);
+                _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U) * (throttle_thrust/_throttle_trim), 0.0F, 1.0F);
+            }
+            else{
+                _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
+            }
         }
     }
 

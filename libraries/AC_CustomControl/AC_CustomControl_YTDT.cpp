@@ -125,86 +125,86 @@ Vector3f AC_CustomControl_YTDT::update(void)
     // '<Root>/HDOT_CMD_MPS'
     float arg_HDOT_CMD_MPS{ 0.0F };
 
-    // '<Root>/VER_VEL_ERR_Kp '
-    float arg_VER_VEL_ERR_Kp_{ 1.5F };
+    // // '<Root>/VER_VEL_ERR_Kp '
+    // float arg_VER_VEL_ERR_Kp_{ 1.5F };
 
-    // '<Root>/VER_VEL_REF_KFF'
-    float arg_VER_VEL_REF_KFF{ 0.0F };
+    // // '<Root>/VER_VEL_REF_KFF'
+    // float arg_VER_VEL_REF_KFF{ 0.0F };
 
-    // '<Root>/VER_VEL_REF_ZETA'
-    float arg_VER_VEL_REF_ZETA{ 0.94F };
+    // // '<Root>/VER_VEL_REF_ZETA'
+    // float arg_VER_VEL_REF_ZETA{ 0.94F };
 
-    // '<Root>/VER_VEL_REF_W0_RADPS'
-    float arg_VER_VEL_REF_W0_RADPS{ 1.1F };
+    // // '<Root>/VER_VEL_REF_W0_RADPS'
+    // float arg_VER_VEL_REF_W0_RADPS{ 1.1F };
 
-    // '<Root>/VER_VEL_REF_K3'
-    float arg_VER_VEL_REF_K3{ 0.483558994F };
+    // // '<Root>/VER_VEL_REF_K3'
+    // float arg_VER_VEL_REF_K3{ 0.483558994F };
 
     // '<Root>/ROLL_ANGLE_ERR_Kp 1'
     float arg_ROLL_ANGLE_ERR_Kp = _roll_angl_err_kp;
 
-    // '<Root>/ROLL_ANGLE_REF_KFF'
-    float arg_ROLL_ANGLE_REF_KFF{ 1.0F };
+    // // '<Root>/ROLL_ANGLE_REF_KFF'
+    // float arg_ROLL_ANGLE_REF_KFF{ 1.0F };
 
-    // '<Root>/ROLL_ANGLE_REF_ZETA'
-    float arg_ROLL_ANGLE_REF_ZETA{ 0.947F };
+    // // '<Root>/ROLL_ANGLE_REF_ZETA'
+    // float arg_ROLL_ANGLE_REF_ZETA{ 0.947F };
 
-    // '<Root>/ROLL_ANGLE_REF_W0_RADPS'
-    float arg_ROLL_ANGLE_REF_W0_RADPS{ 1.1F };
+    // // '<Root>/ROLL_ANGLE_REF_W0_RADPS'
+    // float arg_ROLL_ANGLE_REF_W0_RADPS{ 1.1F };
 
-    // '<Root>/ROLL_ANGLE_REF_K3'
-    float arg_ROLL_ANGLE_REF_K3{ 0.001F };
+    // // '<Root>/ROLL_ANGLE_REF_K3'
+    // float arg_ROLL_ANGLE_REF_K3{ 0.001F };
 
     // '<Root>/ROLL_ANGULAR_RATE_ERR_Kp '
     float arg_ROLL_ANGULAR_RATE_ERR_Kp = _roll_rate_err_kp;
 
-    // '<Root>/ROLL_ANGUALR_RATE_REF_KFF'
-    float arg_ROLL_ANGUALR_RATE_REF_KFF{ 0.0F };
+    // // '<Root>/ROLL_ANGUALR_RATE_REF_KFF'
+    // float arg_ROLL_ANGUALR_RATE_REF_KFF{ 0.0F };
 
-    // '<Root>/ROLL_ANGULAR_RATE_REF_K3'
-    float arg_ROLL_ANGULAR_RATE_REF_K3{ 0.01F };
+    // // '<Root>/ROLL_ANGULAR_RATE_REF_K3'
+    // float arg_ROLL_ANGULAR_RATE_REF_K3{ 0.01F };
 
     // '<Root>/PITCH_ANGLE_ERR_Kp 2'
     float arg_PITCH_ANGLE_ERR_Kp = _pitch_angl_err_kp;
 
-    // '<Root>/PITCH_ANGLE_REF_KFF'
-    float arg_PITCH_ANGLE_REF_KFF{ 0.0F };
+    // // '<Root>/PITCH_ANGLE_REF_KFF'
+    // float arg_PITCH_ANGLE_REF_KFF{ 0.0F };
 
-    // '<Root>/PITCH_ANGLE_REF_ZETA'
-    float arg_PITCH_ANGLE_REF_ZETA{ 0.937F };
+    // // '<Root>/PITCH_ANGLE_REF_ZETA'
+    // float arg_PITCH_ANGLE_REF_ZETA{ 0.937F };
 
-    // '<Root>/PITCH_ANGLE_REF_W0_RADPS'
-    float arg_PITCH_ANGLE_REF_W0_RADPS{ 1.81F };
+    // // '<Root>/PITCH_ANGLE_REF_W0_RADPS'
+    // float arg_PITCH_ANGLE_REF_W0_RADPS{ 1.81F };
 
-    // '<Root>/PITCH_ANGLE_REF_K3'
-    float arg_PITCH_ANGLE_REF_K3{ 0.01F };
+    // // '<Root>/PITCH_ANGLE_REF_K3'
+    // float arg_PITCH_ANGLE_REF_K3{ 0.01F };
 
     // '<Root>/PITCH_ANGULAR_RATE_ERR_Kp '
     float arg_PITCH_ANGULAR_RATE_ERR_Kp = _pitch_rate_err_kp;
 
-    // '<Root>/PITCH_ANGULAR_RATE_REF_KFF'
-    float arg_PITCH_ANGULAR_RATE_REF_KFF{ 0.0F };
+    // // '<Root>/PITCH_ANGULAR_RATE_REF_KFF'
+    // float arg_PITCH_ANGULAR_RATE_REF_KFF{ 0.0F };
 
-    // '<Root>/PITCH_ANGULAR_RATE_REF_K3'
-    float arg_PITCH_ANGULAR_RATE_REF_K3{ 1.0F };
+    // // '<Root>/PITCH_ANGULAR_RATE_REF_K3'
+    // float arg_PITCH_ANGULAR_RATE_REF_K3{ 1.0F };
 
     // '<Root>/YAW_ANGULAR_RATE_ERR_Kp 2'
     float arg_YAW_ANGULAR_RATE_ERR_Kp = _yaw_rate_err_kp;
 
-    // '<Root>/YAW_ANGULAR_RATE_REF_KFF'
-    float arg_YAW_ANGULAR_RATE_REF_KFF{ 0.0F };
+    // // '<Root>/YAW_ANGULAR_RATE_REF_KFF'
+    // float arg_YAW_ANGULAR_RATE_REF_KFF{ 0.0F };
 
-    // '<Root>/YAW_ANGULAR_RATE_REF_ZETA'
-    float arg_YAW_ANGULAR_RATE_REF_ZETA{ 0.707F };
+    // // '<Root>/YAW_ANGULAR_RATE_REF_ZETA'
+    // float arg_YAW_ANGULAR_RATE_REF_ZETA{ 0.707F };
 
-    // '<Root>/YAW_ANGULAR_RATE_REF_W0_RADPS'
-    float arg_YAW_ANGULAR_RATE_REF_W0_RADPS{ 1.01F };
+    // // '<Root>/YAW_ANGULAR_RATE_REF_W0_RADPS'
+    // float arg_YAW_ANGULAR_RATE_REF_W0_RADPS{ 1.01F };
 
-    // '<Root>/YAW_ANGULAR_RATE_REF_K3'
-    float arg_YAW_ANGULAR_RATE_REF_K3{ 0.00001F };
+    // // '<Root>/YAW_ANGULAR_RATE_REF_K3'
+    // float arg_YAW_ANGULAR_RATE_REF_K3{ 0.00001F };
 
-    // '<Root>/DF_FRR_DEGLIN'
-    double arg_DF_FRR_DEGLIN = 30.0F;
+    // // '<Root>/DF_FRR_DEGLIN'
+    // double arg_DF_FRR_DEGLIN = 30.0F;
 
     // '<Root>/P_DOT_CMD'
     float arg_P_DOT_CMD;
@@ -220,22 +220,31 @@ Vector3f AC_CustomControl_YTDT::update(void)
 
     
     // run controller
-    YTDY_controller.step(&arg_DF_FRR_DEG, &arg_P_RADPS,
-    &arg_Q_RADPS, &arg_R_RADPS, &arg_PHI_RAD, &arg_THETA_RAD, &arg_PSI_RAD,
-    &arg_H_DOT_MPS, &arg_ROLL_ATT_CMD_DEG, &arg_PITCH_ATT_CMD_DEG,
-    &arg_YAW_RATE_CMD_DEGPS, &arg_HDOT_CMD_MPS, &arg_VER_VEL_ERR_Kp_,
-    &arg_VER_VEL_REF_KFF, &arg_VER_VEL_REF_ZETA, &arg_VER_VEL_REF_W0_RADPS,
-    &arg_VER_VEL_REF_K3, &arg_ROLL_ANGLE_ERR_Kp, &arg_ROLL_ANGLE_REF_KFF,
-    &arg_ROLL_ANGLE_REF_ZETA, &arg_ROLL_ANGLE_REF_W0_RADPS,
-    &arg_ROLL_ANGLE_REF_K3, &arg_ROLL_ANGULAR_RATE_ERR_Kp,
-    &arg_ROLL_ANGUALR_RATE_REF_KFF, &arg_ROLL_ANGULAR_RATE_REF_K3,
-    &arg_PITCH_ANGLE_ERR_Kp, &arg_PITCH_ANGLE_REF_KFF,
-    &arg_PITCH_ANGLE_REF_ZETA, &arg_PITCH_ANGLE_REF_W0_RADPS,
-    &arg_PITCH_ANGLE_REF_K3, &arg_PITCH_ANGULAR_RATE_ERR_Kp,
-    &arg_PITCH_ANGULAR_RATE_REF_KFF, &arg_PITCH_ANGULAR_RATE_REF_K3,
-    &arg_YAW_ANGULAR_RATE_ERR_Kp, &arg_YAW_ANGULAR_RATE_REF_KFF,
-    &arg_YAW_ANGULAR_RATE_REF_ZETA, &arg_YAW_ANGULAR_RATE_REF_W0_RADPS,
-    &arg_YAW_ANGULAR_RATE_REF_K3, arg_DF_FRR_DEGLIN, arg_P_DOT_CMD,
+    YTDY_controller.step(&arg_DF_FRR_DEG, 
+        &arg_P_RADPS,
+    &arg_Q_RADPS, 
+    &arg_R_RADPS, 
+    &arg_PHI_RAD, 
+    &arg_THETA_RAD, 
+    &arg_PSI_RAD,
+    &arg_H_DOT_MPS, 
+    &arg_ROLL_ATT_CMD_DEG, 
+    &arg_PITCH_ATT_CMD_DEG,
+    &arg_YAW_RATE_CMD_DEGPS, 
+    &arg_HDOT_CMD_MPS, 
+   
+    &arg_ROLL_ANGLE_ERR_Kp, 
+    
+    &arg_ROLL_ANGULAR_RATE_ERR_Kp,
+    
+    &arg_PITCH_ANGLE_ERR_Kp, 
+    
+    &arg_PITCH_ANGULAR_RATE_ERR_Kp,
+   
+    &arg_YAW_ANGULAR_RATE_ERR_Kp, 
+   
+    
+    arg_P_DOT_CMD,
     arg_Q_DOT_CMD, arg_R_DOT_CMD, arg_G_B_MPS2);
 
     // YTscaled parameters
