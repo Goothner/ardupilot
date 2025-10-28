@@ -48,7 +48,7 @@ void CONFULL_CON_TBATT_CONPARA_VECTORModelClass::step(const real32_T * const arg
             arg_PITCH_ANGLE_ERR_Kp, const real32_T * const
             arg_PITCH_ANGULAR_RATE_ERR_Kp, const real32_T * const
             arg_YAW_ANGULAR_RATE_ERR_Kp, real32_T
-            &arg_P_DOT_CMD, real32_T &arg_Q_DOT_CMD, real32_T &arg_R_DOT_CMD, real32_T
+            &arg_P_DOT_CMD_DEGPS2, real32_T &arg_Q_DOT_CMD_DEGPS2, real32_T &arg_R_DOT_CMD_DEGPS2, real32_T
             &arg_G_B_MPS2)
 {
   // local block i/o variables
@@ -819,17 +819,26 @@ void CONFULL_CON_TBATT_CONPARA_VECTORModelClass::step(const real32_T * const arg
     CONSCALE_CON_TBATT_CONPARA_VE_Y.P_DOT_CMD_DEGPS2 =
       CONSCALE_CON_TBATT_CONPARA_VE_P.Gain_Gain_a3 * rtb_Cos_k[0];
 
+    arg_P_DOT_CMD_DEGPS2 = CONSCALE_CON_TBATT_CONPARA_VE_Y.P_DOT_CMD_DEGPS2;
+    
+
     // Outport: '<Root>/Q_DOT_CMD_DEGPS2' incorporates:
     //   Gain: '<S3>/Gain'
 
     CONSCALE_CON_TBATT_CONPARA_VE_Y.Q_DOT_CMD_DEGPS2 =
       CONSCALE_CON_TBATT_CONPARA_VE_P.Gain_Gain_p * rtb_Cos_k[1];
 
+    arg_Q_DOT_CMD_DEGPS2 = CONSCALE_CON_TBATT_CONPARA_VE_Y.Q_DOT_CMD_DEGPS2;
+    
+
     // Outport: '<Root>/R_DOT_CMD_DEGPS2' incorporates:
     //   Gain: '<S4>/Gain'
 
     CONSCALE_CON_TBATT_CONPARA_VE_Y.R_DOT_CMD_DEGPS2 =
       CONSCALE_CON_TBATT_CONPARA_VE_P.Gain_Gain_g * rtb_Cos_k[2];
+
+    arg_R_DOT_CMD_DEGPS2 = CONSCALE_CON_TBATT_CONPARA_VE_Y.R_DOT_CMD_DEGPS2;
+    
 
     // Outport: '<Root>/DF_FRR_DEGLIN' incorporates:
     //   Gain: '<Root>/Gain1'
@@ -966,6 +975,8 @@ void CONFULL_CON_TBATT_CONPARA_VECTORModelClass::step(const real32_T * const arg
     CONSCALE_CON_TBATT_CONPARA_VE_Y.ZDDOT_CMD_MPS2 = (rtb_Product_hb +
       rtb_DiscreteZeroPole) * CONSCALE_CON_TBATT_CONPARA_VE_P.Gain1_Gain_oj *
       (1.0F / rtb_Sin_idx_0_tmp / rtb_VectorConcatenate2_tmp);
+
+    arg_G_B_MPS2 = CONSCALE_CON_TBATT_CONPARA_VE_Y.ZDDOT_CMD_MPS2;
 
     // Update for DiscreteIntegrator: '<S43>/Integrator1'
     CONSCALE_CON_TBATT_CONPARA_V_DW.Integrator1_DSTATE +=

@@ -469,19 +469,28 @@ class CONFULL_CON_TBATT_CONPARA_VECTORModelClass {
   void initialize();
 
   // model step function
-  void step(const real32_T * const arg_DF_FRR_DEG, real32_T *arg_P_RADPS,
-            real32_T *arg_Q_RADPS, real32_T *arg_R_RADPS, real32_T *arg_PHI_RAD,
-            real32_T *arg_THETA_RAD, real32_T *arg_PSI_RAD, real32_T
-            *arg_H_DOT_MPS, real32_T *arg_ROLL_ATT_CMD_DEG, real32_T
-            *arg_PITCH_ATT_CMD_DEG, real32_T *arg_YAW_RATE_CMD_DEGPS, real32_T
-            *arg_HDOT_CMD_MPS,
-            const real32_T * const arg_ROLL_ANGLE_ERR_Kp, const real32_T * const
-            arg_ROLL_ANGULAR_RATE_ERR_Kp, const real32_T * const
-            arg_PITCH_ANGLE_ERR_Kp, const real32_T * const
-            arg_PITCH_ANGULAR_RATE_ERR_Kp, const real32_T * const
-            arg_YAW_ANGULAR_RATE_ERR_Kp, real32_T
-            &arg_P_DOT_CMD, real32_T &arg_Q_DOT_CMD, real32_T &arg_R_DOT_CMD, real32_T
-            &arg_G_B_MPS2);
+void step(
+    const real32_T * const arg_DF_FRR_DEG, 
+    real32_T *arg_P_RADPS,
+    real32_T *arg_Q_RADPS, 
+    real32_T *arg_R_RADPS, 
+    real32_T *arg_PHI_RAD,
+    real32_T *arg_THETA_RAD, 
+    real32_T *arg_PSI_RAD, 
+    real32_T *arg_H_DOT_MPS, 
+    real32_T *arg_ROLL_ATT_CMD_DEG, 
+    real32_T *arg_PITCH_ATT_CMD_DEG, 
+    real32_T *arg_YAW_RATE_CMD_DEGPS, 
+    real32_T *arg_HDOT_CMD_MPS,
+    const real32_T * const arg_ROLL_ANGLE_ERR_Kp, 
+    const real32_T * const arg_ROLL_ANGULAR_RATE_ERR_Kp, 
+    const real32_T * const  arg_PITCH_ANGLE_ERR_Kp, 
+    const real32_T * const arg_PITCH_ANGULAR_RATE_ERR_Kp, 
+    const real32_T * const arg_YAW_ANGULAR_RATE_ERR_Kp, 
+    real32_T &arg_P_DOT_CMD_DEGPS2, 
+    real32_T &arg_Q_DOT_CMD_DEGPS2, 
+    real32_T &arg_R_DOT_CMD_DEGPS2, 
+    real32_T  &arg_G_B_MPS2);
 
   // model terminate function
   void terminate();

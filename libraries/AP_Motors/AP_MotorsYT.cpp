@@ -614,6 +614,21 @@ void AP_MotorsYT::output_armed_stabilizing()
         }
     }
 
+    //           0 1 2 3 || 4 5 6 7 
+    //  19 18 17 16 15 14||13 12 11 10 9 8
+    //20                                    21
+    //           0 1 2 3 || 4 5 6 7 
+    //  17 16 15 14 13 13||12 12 11 10 9 8
+    //18                                    19
+    _thrust_rpyt_out[13] = _thrust_rpyt_out[14];
+    _thrust_rpyt_out[14] = _thrust_rpyt_out[16];
+    _thrust_rpyt_out[15] = _thrust_rpyt_out[17];
+    _thrust_rpyt_out[16] = _thrust_rpyt_out[18];
+    _thrust_rpyt_out[17] = _thrust_rpyt_out[19];
+    _thrust_rpyt_out[18] = _thrust_rpyt_out[20];
+    _thrust_rpyt_out[19] = _thrust_rpyt_out[21];
+    
+
     // determine throttle thrust for harmonic notch
     // compensation_gain can never be zero
     _throttle_out = throttle_thrust_best_plus_adj / compensation_gain;

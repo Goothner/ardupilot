@@ -14,31 +14,31 @@ const AP_Param::GroupInfo AC_CustomControl_YTDT::var_info[] = {
     // @DisplayName: YTDT param1
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
-    AP_GROUPINFO("YT_ROL_ANG_P", 1, AC_CustomControl_YTDT, _roll_angl_err_kp, 2.0f),
+    AP_GROUPINFO("YT_ROL_ANG_P", 1, AC_CustomControl_YTDT, _roll_angl_err_kp, 1.3f),
 
     // @Param: PARAM2
     // @DisplayName: YTDT param2
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
-    AP_GROUPINFO("YT_ROL_RAT_P", 2, AC_CustomControl_YTDT, _roll_rate_err_kp, 2.2f),
+    AP_GROUPINFO("YT_ROL_RAT_P", 2, AC_CustomControl_YTDT, _roll_rate_err_kp, 5.4f),
 
     // @Param: PARAM3
     // @DisplayName: YTDT param3
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
-    AP_GROUPINFO("YT_PIT_ANG_P", 3, AC_CustomControl_YTDT, _pitch_angl_err_kp, 3.8f),
+    AP_GROUPINFO("YT_PIT_ANG_P", 3, AC_CustomControl_YTDT, _pitch_angl_err_kp, 4.0f),
 
     // @Param: PARAM4
     // @DisplayName: YTDT param3
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
-    AP_GROUPINFO("YT_PIT_RAT_P", 4, AC_CustomControl_YTDT, _pitch_rate_err_kp, 5.0f),
+    AP_GROUPINFO("YT_PIT_RAT_P", 4, AC_CustomControl_YTDT, _pitch_rate_err_kp, 14.0f),
 
     // @Param: PARAM5
     // @DisplayName: YTDT param3
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
-    AP_GROUPINFO("YT_YAW_RAT_P", 5, AC_CustomControl_YTDT, _yaw_rate_err_kp, 1.5f),
+    AP_GROUPINFO("YT_YAW_RAT_P", 5, AC_CustomControl_YTDT, _yaw_rate_err_kp, 3.0f),
 
     AP_GROUPEND
 };
@@ -80,28 +80,28 @@ Vector3f AC_CustomControl_YTDT::update(void)
     _ahrs->get_quat_body_to_ned(attitude_body);
 
     // '<Root>/DF_FRR_DEG'
-    float arg_DF_FRR_DEG{ 30.0F };
+    arg_DF_FRR_DEG = 30.0F;
 
     // '<Root>/P_RADPS'
-    float arg_P_RADPS{ _ahrs->get_gyro().x };
+    arg_P_RADPS = { _ahrs->get_gyro().x };
 
     // '<Root>/Q_RADPS'
-    float arg_Q_RADPS{ _ahrs->get_gyro().y };
+    arg_Q_RADPS = { _ahrs->get_gyro().y };
 
     // '<Root>/R_RADPS'
-    float arg_R_RADPS{ _ahrs->get_gyro().z };
+    arg_R_RADPS = { _ahrs->get_gyro().z };
 
     // '<Root>/PHI_RAD'
-    float arg_PHI_RAD{ attitude_body.get_euler_roll() };
+    arg_PHI_RAD = { attitude_body.get_euler_roll() };
 
     // '<Root>/THETA_RAD'
-    float arg_THETA_RAD{ attitude_body.get_euler_pitch() };
+    arg_THETA_RAD = { attitude_body.get_euler_pitch() };
 
     // '<Root>/PSI_RAD'
-    float arg_PSI_RAD{ attitude_body.get_euler_yaw() };
+    arg_PSI_RAD = { attitude_body.get_euler_yaw() };
 
     // '<Root>/H_DOT_MPS'
-    float arg_H_DOT_MPS{ 0.0F };
+    arg_H_DOT_MPS = 0.0F;
 
     // Return 321-intrinsic euler angles in centidegrees representing the rotation from NED earth frame to the
     // attitude controller's target attitude.
@@ -114,16 +114,16 @@ Vector3f AC_CustomControl_YTDT::update(void)
         // const Vector3f& get_rate_ef_targets() const { return _euler_rate_target; }
 
     // '<Root>/ROLL_ATT_CMD_DEG'
-    float arg_ROLL_ATT_CMD_DEG{ _att_control->get_att_target_euler_cd().x/100.0F};
+    arg_ROLL_ATT_CMD_DEG = { _att_control->get_att_target_euler_cd().x/100.0F};
 
     // '<Root>/PITCH_ATT_CMD_DEG'
-    float arg_PITCH_ATT_CMD_DEG{ _att_control->get_att_target_euler_cd().y/100.0F};
+    arg_PITCH_ATT_CMD_DEG = { _att_control->get_att_target_euler_cd().y/100.0F};
 
     // '<Root>/YAW_RATE_CMD_DEGPS'
-    float arg_YAW_RATE_CMD_DEGPS{ degrees(_att_control->get_rate_ef_targets().z)};
+    arg_YAW_RATE_CMD_DEGPS = { degrees(_att_control->get_rate_ef_targets().z)};
 
     // '<Root>/HDOT_CMD_MPS'
-    float arg_HDOT_CMD_MPS{ 0.0F };
+    arg_HDOT_CMD_MPS = 0.0F;
 
     // // '<Root>/VER_VEL_ERR_Kp '
     // float arg_VER_VEL_ERR_Kp_{ 1.5F };
@@ -141,7 +141,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     // float arg_VER_VEL_REF_K3{ 0.483558994F };
 
     // '<Root>/ROLL_ANGLE_ERR_Kp 1'
-    float arg_ROLL_ANGLE_ERR_Kp = _roll_angl_err_kp;
+    arg_ROLL_ANGLE_ERR_Kp = _roll_angl_err_kp;
 
     // // '<Root>/ROLL_ANGLE_REF_KFF'
     // float arg_ROLL_ANGLE_REF_KFF{ 1.0F };
@@ -156,7 +156,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     // float arg_ROLL_ANGLE_REF_K3{ 0.001F };
 
     // '<Root>/ROLL_ANGULAR_RATE_ERR_Kp '
-    float arg_ROLL_ANGULAR_RATE_ERR_Kp = _roll_rate_err_kp;
+    arg_ROLL_ANGULAR_RATE_ERR_Kp = _roll_rate_err_kp;
 
     // // '<Root>/ROLL_ANGUALR_RATE_REF_KFF'
     // float arg_ROLL_ANGUALR_RATE_REF_KFF{ 0.0F };
@@ -165,7 +165,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     // float arg_ROLL_ANGULAR_RATE_REF_K3{ 0.01F };
 
     // '<Root>/PITCH_ANGLE_ERR_Kp 2'
-    float arg_PITCH_ANGLE_ERR_Kp = _pitch_angl_err_kp;
+    arg_PITCH_ANGLE_ERR_Kp = _pitch_angl_err_kp;
 
     // // '<Root>/PITCH_ANGLE_REF_KFF'
     // float arg_PITCH_ANGLE_REF_KFF{ 0.0F };
@@ -180,7 +180,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     // float arg_PITCH_ANGLE_REF_K3{ 0.01F };
 
     // '<Root>/PITCH_ANGULAR_RATE_ERR_Kp '
-    float arg_PITCH_ANGULAR_RATE_ERR_Kp = _pitch_rate_err_kp;
+    arg_PITCH_ANGULAR_RATE_ERR_Kp = _pitch_rate_err_kp;
 
     // // '<Root>/PITCH_ANGULAR_RATE_REF_KFF'
     // float arg_PITCH_ANGULAR_RATE_REF_KFF{ 0.0F };
@@ -189,7 +189,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     // float arg_PITCH_ANGULAR_RATE_REF_K3{ 1.0F };
 
     // '<Root>/YAW_ANGULAR_RATE_ERR_Kp 2'
-    float arg_YAW_ANGULAR_RATE_ERR_Kp = _yaw_rate_err_kp;
+    arg_YAW_ANGULAR_RATE_ERR_Kp = _yaw_rate_err_kp;
 
     // // '<Root>/YAW_ANGULAR_RATE_REF_KFF'
     // float arg_YAW_ANGULAR_RATE_REF_KFF{ 0.0F };
@@ -206,61 +206,44 @@ Vector3f AC_CustomControl_YTDT::update(void)
     // // '<Root>/DF_FRR_DEGLIN'
     // double arg_DF_FRR_DEGLIN = 30.0F;
 
-    // '<Root>/P_DOT_CMD'
-    float arg_P_DOT_CMD;
-
-    // '<Root>/Q_DOT_CMD'
-    float arg_Q_DOT_CMD;
-
-    // '<Root>/R_DOT_CMD'
-    float arg_R_DOT_CMD;
-
-    // '<Root>/G_B_MPS2'
-    float arg_G_B_MPS2;
+   
 
     
     // run controller
-    YTDY_controller.step(&arg_DF_FRR_DEG, 
+    YTDY_controller.step(
+        &arg_DF_FRR_DEG, 
         &arg_P_RADPS,
-    &arg_Q_RADPS, 
-    &arg_R_RADPS, 
-    &arg_PHI_RAD, 
-    &arg_THETA_RAD, 
-    &arg_PSI_RAD,
-    &arg_H_DOT_MPS, 
-    &arg_ROLL_ATT_CMD_DEG, 
-    &arg_PITCH_ATT_CMD_DEG,
-    &arg_YAW_RATE_CMD_DEGPS, 
-    &arg_HDOT_CMD_MPS, 
-   
-    &arg_ROLL_ANGLE_ERR_Kp, 
-    
-    &arg_ROLL_ANGULAR_RATE_ERR_Kp,
-    
-    &arg_PITCH_ANGLE_ERR_Kp, 
-    
-    &arg_PITCH_ANGULAR_RATE_ERR_Kp,
-   
-    &arg_YAW_ANGULAR_RATE_ERR_Kp, 
-   
-    
-    arg_P_DOT_CMD,
-    arg_Q_DOT_CMD, arg_R_DOT_CMD, arg_G_B_MPS2);
+        &arg_Q_RADPS, 
+        &arg_R_RADPS, 
+        &arg_PHI_RAD, 
+        &arg_THETA_RAD, 
+        &arg_PSI_RAD,
+        &arg_H_DOT_MPS, 
+        &arg_ROLL_ATT_CMD_DEG, 
+        &arg_PITCH_ATT_CMD_DEG,
+        &arg_YAW_RATE_CMD_DEGPS, 
+        &arg_HDOT_CMD_MPS, 
+        &arg_ROLL_ANGLE_ERR_Kp, 
+        &arg_ROLL_ANGULAR_RATE_ERR_Kp,
+        &arg_PITCH_ANGLE_ERR_Kp, 
+        &arg_PITCH_ANGULAR_RATE_ERR_Kp,
+        &arg_YAW_ANGULAR_RATE_ERR_Kp, 
+        arg_P_DOT_CMD_DEGPS2,
+        arg_Q_DOT_CMD_DEGPS2, 
+        arg_R_DOT_CMD_DEGPS2, 
+        arg_G_B_MPS2);
 
-    // YTscaled parameters
-    // float _P_DOT_max_degss = 7.0F;//7.1
-    // float _Q_DOT_max_degss = 19.0F;//19.2
-    // float _R_DOT_max_degss = 2.23F;//2.236
 
     //
     //gcs().send_text(MAV_SEVERITY_INFO, "YTDT controller working");
     //gcs().send_text(MAV_SEVERITY_INFO, "get_dt = %.4f ", _att_control->get_dt());
     gcs().send_text(MAV_SEVERITY_INFO, "YT-10:33 input deg: R= %.2f,P= %.2f,Y= %.2f ",arg_ROLL_ATT_CMD_DEG, arg_PITCH_ATT_CMD_DEG, arg_YAW_RATE_CMD_DEGPS);
+    gcs().send_text(MAV_SEVERITY_INFO, "YT-10:56 ouput: P= %.2f,Q= %.2f,R= %.2f ",arg_P_DOT_CMD_DEGPS2, arg_Q_DOT_CMD_DEGPS2, arg_R_DOT_CMD_DEGPS2);
     //hal.console->printf("\n\n NFCY test! %.2f \n\n", 1.234f);
     //hal.console->printf("\n\n NFCY test! %.2f \n\n", nfcytest)
 
     // return what arducopter main controller outputted
-    return Vector3f(constrain_float(arg_P_DOT_CMD/_P_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_R_DOT_CMD/_Q_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_G_B_MPS2/_R_DOT_max_degss, -1.0F, 1.0F));
+    return Vector3f(constrain_float(arg_P_DOT_CMD_DEGPS2/_P_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_Q_DOT_CMD_DEGPS2/_Q_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_R_DOT_CMD_DEGPS2/_R_DOT_max_degss, -1.0F, 1.0F));
 }
 
 // reset controller to avoid build up on the ground
