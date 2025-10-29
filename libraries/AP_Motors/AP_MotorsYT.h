@@ -191,9 +191,9 @@ private:
     const float _P_DOT_max_degss = 8.8F;//7.1
     const float _Q_DOT_max_degss = 22.0F;//19.2
     const float _R_DOT_max_degss = 5.59F;//2.236
-    const float _JXX_kgm2 = 5.41F;//0.54135186
-    const float _JYY_kgm2 = 9.51F;//0.950637144
-    const float _JZZ_kgm2 = 14.35F;//1.435035916
+    const float _JXX_kgm2 = 54.1F;//0.54135186
+    const float _JYY_kgm2 = 95.1F;//0.950637144
+    const float _JZZ_kgm2 = 143.5F;//1.435035916
     const float _Mass_kg = 12.9;
 
     const float _DF_DEG_Value[22] {               30.0F, 30.0F, 30.0F, 30.0F, 180.0F, 
@@ -235,7 +235,7 @@ private:
     //     -0.34700000000000003F, -0.125F, -0.08F, -0.34700000000000003F, -0.2F, -0.08F, -0.34700000000000003F, -0.275F, -0.08F,
     //     -0.34700000000000003F, -0.35000000000000003F, -0.08F, -0.34700000000000003F,
     //     -0.425F, -0.08F, -0.34700000000000003F, -0.5F, -0.08F };
-    //10-26 merge motor 13&14 motor 15&16:
+    // //10-26 merge motor 13&14 motor 15&16:
     const float _vehicle_DUCT_LeverArm_m[66]{ 0.443F, 0.176F, 0.0F, 0.443F, 0.251F, 0.0F, 0.443F, 0.326F, 0.0F, 0.443F, 0.401F, 0.0F, 
         0.443F, 0.496F, -0.03F, 
         0.443F, -0.176F, 0.0F, 0.443F, -0.251F, 0.0F, 0.443F, -0.326F, 0.0F, 0.443F, -0.401F, 0.0F, 
