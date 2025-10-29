@@ -381,7 +381,7 @@ void AP_MotorsYT::output_armed_stabilizing()
     float arg_F_Z_N = -1.731F;
 
     //hal.console->printf("\n\n Input r= %.2f, p= %.2f, y= %.2f, t= %.2f \n\n", roll_thrust, pitch_thrust, yaw_thrust, throttle_thrust);
-
+    //hal.console->printf("\n\n Input L= %.2f, M= %.2f, N= %.2f, Fz= %.2f \n\n", arg_L_NM, arg_M_NM, arg_N_NM, arg_F_Z_N);
    
     if(throttle_thrust < _throttle_trim)
     {
@@ -402,8 +402,8 @@ void AP_MotorsYT::output_armed_stabilizing()
             //   Sum: '<Root>/Sum'
 
             
-            //rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] * (throttle_thrust/_throttle_trim));
-            rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0]);
+            rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] * (throttle_thrust/_throttle_trim));
+            //rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0]);
         }
     }
     else//throttle_thrust > _throttle_trim
@@ -430,23 +430,23 @@ void AP_MotorsYT::output_armed_stabilizing()
         }
     }
                
-    for (i_0 = 0; i_0 < 22; i_0++) {
-        // Product: '<S1>/Matrix Multiply' incorporates:
-        //   Inport: '<Root>/F_Z_N'
-        //   Inport: '<Root>/L_NM'
-        //   Inport: '<Root>/M_NM'
-        //   Inport: '<Root>/N_NM'
+    // for (i_0 = 0; i_0 < 22; i_0++) {
+    //     // Product: '<S1>/Matrix Multiply' incorporates:
+    //     //   Inport: '<Root>/F_Z_N'
+    //     //   Inport: '<Root>/L_NM'
+    //     //   Inport: '<Root>/M_NM'
+    //     //   Inport: '<Root>/N_NM'
 
-        rtb_CTz_Lookup_p = rtb_Binv[i_0 + 66] * arg_N_NM + (rtb_Binv[i_0 + 44] * arg_M_NM + (rtb_Binv[i_0 + 22] * arg_L_NM + rtb_Binv[i_0] * arg_F_Z_N));
+    //     rtb_CTz_Lookup_p = rtb_Binv[i_0 + 66] * arg_N_NM + (rtb_Binv[i_0 + 44] * arg_M_NM + (rtb_Binv[i_0 + 22] * arg_L_NM + rtb_Binv[i_0] * arg_F_Z_N));
 
-        // Sqrt: '<Root>/Sqrt' incorporates:
-        //   Constant: '<Root>/Constant'
-        //   Gain: '<S1>/Gain3'
-        //   Math: '<Root>/Square'
-        //   Sum: '<Root>/Sum'
+    //     // Sqrt: '<Root>/Sqrt' incorporates:
+    //     //   Constant: '<Root>/Constant'
+    //     //   Gain: '<S1>/Gain3'
+    //     //   Math: '<Root>/Square'
+    //     //   Sum: '<Root>/Sum'
 
-        rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0]);
-    }
+    //     rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0]);
+    // }
 
     // SignalConversion generated from: '<Root>/RPM2PWM'
     rtb_CTz_Lookup[0] = rtb_CTx_Lookup[8];
@@ -605,11 +605,14 @@ void AP_MotorsYT::output_armed_stabilizing()
     for (uint8_t r = 0; r < AP_MOTORS_MAX_NUM_MOTORS; r++) {
         if (motor_enabled[r]) {
             if(throttle_thrust < _throttle_trim){
-                _thrust_rpyt_out[r] = (throttle_thrust_best_plus_adj * _throttle_factor[r]) + (rpy_scale * _thrust_rpyt_out[r]);
-                _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U) * (throttle_thrust/_throttle_trim), 0.0F, 1.0F);
+                _thrust_rpyt_out_22t[r] = (throttle_thrust_best_plus_adj * _throttle_factor[r]) + (rpy_scale * _thrust_rpyt_out[r]);
+                //_thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U) * (throttle_thrust/_throttle_trim), 0.0F, 1.0F);
+                _thrust_rpyt_out_22t[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
+                if(r==0)hal.console->printf("\n\n throttle_thrust < %.2f \n\n", _throttle_trim);
             }
             else{
-                _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
+                _thrust_rpyt_out_22t[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
+                if(r==0)hal.console->printf("\n\n throttle_thrust > %.2f \n\n", _throttle_trim);
             }
         }
     }
@@ -620,14 +623,29 @@ void AP_MotorsYT::output_armed_stabilizing()
     //           0 1 2 3 || 4 5 6 7 
     //  17 16 15 14 13 13||12 12 11 10 9 8
     //18                                    19
-    _thrust_rpyt_out[13] = _thrust_rpyt_out[14];
-    _thrust_rpyt_out[14] = _thrust_rpyt_out[16];
-    _thrust_rpyt_out[15] = _thrust_rpyt_out[17];
-    _thrust_rpyt_out[16] = _thrust_rpyt_out[18];
-    _thrust_rpyt_out[17] = _thrust_rpyt_out[19];
-    _thrust_rpyt_out[18] = _thrust_rpyt_out[20];
-    _thrust_rpyt_out[19] = _thrust_rpyt_out[21];
-    
+
+    _thrust_rpyt_out[0] = _thrust_rpyt_out_22t[0];
+    _thrust_rpyt_out[1] = _thrust_rpyt_out_22t[1];
+    _thrust_rpyt_out[2] = _thrust_rpyt_out_22t[2];
+    _thrust_rpyt_out[3] = _thrust_rpyt_out_22t[3];
+    _thrust_rpyt_out[4] = _thrust_rpyt_out_22t[4];
+    _thrust_rpyt_out[5] = _thrust_rpyt_out_22t[5];
+    _thrust_rpyt_out[6] = _thrust_rpyt_out_22t[6];
+    _thrust_rpyt_out[7] = _thrust_rpyt_out_22t[7];
+    _thrust_rpyt_out[8] = _thrust_rpyt_out_22t[8];
+    _thrust_rpyt_out[9] = _thrust_rpyt_out_22t[9];
+    _thrust_rpyt_out[10] = _thrust_rpyt_out_22t[10];
+    _thrust_rpyt_out[11] = _thrust_rpyt_out_22t[11];
+    _thrust_rpyt_out[12] = _thrust_rpyt_out_22t[12];
+    _thrust_rpyt_out[13] = _thrust_rpyt_out_22t[14];
+    _thrust_rpyt_out[14] = _thrust_rpyt_out_22t[16];
+    _thrust_rpyt_out[15] = _thrust_rpyt_out_22t[17];
+    _thrust_rpyt_out[16] = _thrust_rpyt_out_22t[18];
+    _thrust_rpyt_out[17] = _thrust_rpyt_out_22t[19];
+    _thrust_rpyt_out[18] = _thrust_rpyt_out_22t[20];
+    _thrust_rpyt_out[19] = _thrust_rpyt_out_22t[21];
+    //hal.console->printf("\n\n OutputT m1= %.2f, m8= %.2f, m9= %.2f, m20= %.2f \n\n", _thrust_rpyt_out[0], _thrust_rpyt_out[7], _thrust_rpyt_out[8], _thrust_rpyt_out[17]);
+    //hal.console->printf("\n\n OutputT m1= %.3f, m8= %.3f, m9= %.3f, m20= %.3f \n\n", _thrust_rpyt_out_22t[0], _thrust_rpyt_out_22t[7], _thrust_rpyt_out_22t[8], _thrust_rpyt_out_22t[19]);
 
     // determine throttle thrust for harmonic notch
     // compensation_gain can never be zero

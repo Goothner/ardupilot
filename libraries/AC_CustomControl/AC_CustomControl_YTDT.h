@@ -42,7 +42,7 @@ protected:
     float arg_R_RADPS{ 0.0F  };
 
       // '<Root>/PHI_RAD'
-    float arg_PHI_RAD{0.0F };
+    float arg_PHI_RAD{ 0.0F };
 
     // '<Root>/THETA_RAD'
     float arg_THETA_RAD{ 0.0F };
@@ -81,16 +81,16 @@ protected:
     float arg_YAW_ANGULAR_RATE_ERR_Kp = 0.0F;
 
      // '<Root>/P_DOT_CMD'
-    float arg_P_DOT_CMD_DEGPS2 = 0;
+    float arg_P_DOT_CMD_DEGPS2 = 0.0F;
 
     // '<Root>/Q_DOT_CMD'
-    float arg_Q_DOT_CMD_DEGPS2 = 0;
+    float arg_Q_DOT_CMD_DEGPS2 = 0.0F;
 
     // '<Root>/R_DOT_CMD'
-    float arg_R_DOT_CMD_DEGPS2 = 0;
+    float arg_R_DOT_CMD_DEGPS2 = 0.0F;
 
     // '<Root>/G_B_MPS2'
-    float arg_G_B_MPS2 = 0;
+    float arg_G_B_MPS2 = 0.0F;
     
     // YTscaled parameters
     float _P_DOT_max_degss = 8.8F;//7.1

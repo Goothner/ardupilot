@@ -206,9 +206,6 @@ Vector3f AC_CustomControl_YTDT::update(void)
     // // '<Root>/DF_FRR_DEGLIN'
     // double arg_DF_FRR_DEGLIN = 30.0F;
 
-   
-
-    
     // run controller
     YTDY_controller.step(
         &arg_DF_FRR_DEG, 
@@ -234,13 +231,9 @@ Vector3f AC_CustomControl_YTDT::update(void)
         arg_G_B_MPS2);
 
 
-    //
-    //gcs().send_text(MAV_SEVERITY_INFO, "YTDT controller working");
-    //gcs().send_text(MAV_SEVERITY_INFO, "get_dt = %.4f ", _att_control->get_dt());
-    gcs().send_text(MAV_SEVERITY_INFO, "YT-10:33 input deg: R= %.2f,P= %.2f,Y= %.2f ",arg_ROLL_ATT_CMD_DEG, arg_PITCH_ATT_CMD_DEG, arg_YAW_RATE_CMD_DEGPS);
-    gcs().send_text(MAV_SEVERITY_INFO, "YT-10:56 ouput: P= %.2f,Q= %.2f,R= %.2f ",arg_P_DOT_CMD_DEGPS2, arg_Q_DOT_CMD_DEGPS2, arg_R_DOT_CMD_DEGPS2);
+    gcs().send_text(MAV_SEVERITY_INFO, "YT input deg: R= %.2f,P= %.2f,Y= %.2f ",arg_ROLL_ATT_CMD_DEG, arg_PITCH_ATT_CMD_DEG, arg_YAW_RATE_CMD_DEGPS);
+    gcs().send_text(MAV_SEVERITY_INFO, "YT-15:23 ouput: P= %.2f,Q= %.2f,R= %.2f ",arg_P_DOT_CMD_DEGPS2/_P_DOT_max_degss, arg_Q_DOT_CMD_DEGPS2/_Q_DOT_max_degss, arg_R_DOT_CMD_DEGPS2/_R_DOT_max_degss);
     //hal.console->printf("\n\n NFCY test! %.2f \n\n", 1.234f);
-    //hal.console->printf("\n\n NFCY test! %.2f \n\n", nfcytest)
 
     // return what arducopter main controller outputted
     return Vector3f(constrain_float(arg_P_DOT_CMD_DEGPS2/_P_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_Q_DOT_CMD_DEGPS2/_Q_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_R_DOT_CMD_DEGPS2/_R_DOT_max_degss, -1.0F, 1.0F));
