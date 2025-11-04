@@ -194,7 +194,8 @@ private:
     const float _JXX_kgm2 = 541.35F;//0.54135186
     const float _JYY_kgm2 = 190.0F;//0.950637144
     const float _JZZ_kgm2 = 143.5F;//1.435035916
-    const float _Mass_kg = 12.9;
+    const float _Mass_kg = 12.9F;
+    const float _H_DDOT_Max_mps2 = -0.47F;
 
     const float _DF_DEG_Value[22] {               30.0F, 30.0F, 30.0F, 30.0F, 180.0F, 
         30.0F, 30.0F, 30.0F, 30.0F, 180.0F,

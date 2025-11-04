@@ -377,76 +377,79 @@ void AP_MotorsYT::output_armed_stabilizing()
     float arg_L_NM = roll_thrust * radians(_P_DOT_max_degss) * _JXX_kgm2;
     float arg_M_NM = pitch_thrust * radians(_Q_DOT_max_degss) * _JYY_kgm2;
     float arg_N_NM = yaw_thrust * radians(_R_DOT_max_degss) * _JZZ_kgm2;
-    //float arg_F_Z_N = -1.0 * _Mass_kg * 9.8F;
-    float arg_F_Z_N = -1.731F;
-
+    // float arg_F_Z_N = -1.0 * _Mass_kg * 9.8F;
+    // float arg_F_Z_N = -1.731F;
+    // float arg_F_Z_N = -1.731F + throttle_thrust * (_Mass_kg * _H_DDOT_Max_mps2 - (-1.731F) );
+    // float arg_F_Z_N = (_Mass_kg * 9.8F * 1.5F) + throttle_thrust * ( (-1.731F) - (_Mass_kg * 9.8F * 1.5F));
+    float arg_F_Z_N = (_Mass_kg * 9.8F * 1.5F) + throttle_thrust * ( (_Mass_kg * _H_DDOT_Max_mps2 * 0.5F) - (_Mass_kg * 9.8F * 1.5F));
+    
     hal.console->printf("\n\n Input r= %.2f, p= %.2f, y= %.2f, t= %.2f \n\n", roll_thrust, pitch_thrust, yaw_thrust, throttle_thrust);
-    hal.console->printf("\n\n Input L= %.2f, M= %.2f, N= %.2f, Fz= %.2f \n\n", arg_L_NM, arg_M_NM, arg_N_NM, arg_F_Z_N);
+    hal.console->printf("\n\n Input0.5 L= %.3f, M= %.3f, N= %.3f, Fz= %.3f \n\n", arg_L_NM, arg_M_NM, arg_N_NM, arg_F_Z_N);
    
-    if(throttle_thrust < _throttle_trim)
-    {
-        for (i_0 = 0; i_0 < 22; i_0++)
-        {
-            // Product: '<S1>/Matrix Multiply' incorporates:
-            //   Inport: '<Root>/F_Z_N'
-            //   Inport: '<Root>/L_NM'
-            //   Inport: '<Root>/M_NM'
-            //   Inport: '<Root>/N_NM'
+    // if(throttle_thrust < _throttle_trim)
+    // {
+    //     for (i_0 = 0; i_0 < 22; i_0++)
+    //     {
+    //         // Product: '<S1>/Matrix Multiply' incorporates:
+    //         //   Inport: '<Root>/F_Z_N'
+    //         //   Inport: '<Root>/L_NM'
+    //         //   Inport: '<Root>/M_NM'
+    //         //   Inport: '<Root>/N_NM'
 
-            rtb_CTz_Lookup_p = rtb_Binv[i_0 + 66] * arg_N_NM + (rtb_Binv[i_0 + 44] * arg_M_NM + (rtb_Binv[i_0 + 22] * arg_L_NM + rtb_Binv[i_0] * arg_F_Z_N));
+    //         rtb_CTz_Lookup_p = rtb_Binv[i_0 + 66] * arg_N_NM + (rtb_Binv[i_0 + 44] * arg_M_NM + (rtb_Binv[i_0 + 22] * arg_L_NM + rtb_Binv[i_0] * arg_F_Z_N));
 
-            // Sqrt: '<Root>/Sqrt' incorporates:
-            //   Constant: '<Root>/Constant'
-            //   Gain: '<S1>/Gain3'
-            //   Math: '<Root>/Square'
-            //   Sum: '<Root>/Sum'
+    //         // Sqrt: '<Root>/Sqrt' incorporates:
+    //         //   Constant: '<Root>/Constant'
+    //         //   Gain: '<S1>/Gain3'
+    //         //   Math: '<Root>/Square'
+    //         //   Sum: '<Root>/Sum'
 
             
-            rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] * (throttle_thrust/_throttle_trim));
-            //rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0]);
-        }
-    }
-    else//throttle_thrust > _throttle_trim
-    { 
-        for (i_0 = 0; i_0 < 22; i_0++)
-        {
-            // Product: '<S1>/Matrix Multiply' incorporates:
-            //   Inport: '<Root>/F_Z_N'
-            //   Inport: '<Root>/L_NM'
-            //   Inport: '<Root>/M_NM'
-            //   Inport: '<Root>/N_NM'
-
-            rtb_CTz_Lookup_p = rtb_Binv[i_0 + 66] * arg_N_NM + (rtb_Binv[i_0 + 44] * arg_M_NM + (rtb_Binv[i_0 + 22] * arg_L_NM + rtb_Binv[i_0] * arg_F_Z_N));
-
-            // Sqrt: '<Root>/Sqrt' incorporates:
-            //   Constant: '<Root>/Constant'
-            //   Gain: '<S1>/Gain3'
-            //   Math: '<Root>/Square'
-            //   Sum: '<Root>/Sum'
-
-            if(i_0==0||i_0==1||i_0==2||i_0==3||i_0==5||i_0==6||i_0==7||i_0==8)rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] + 4.05F * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) );
-            else if(i_0==4||i_0==9)rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] + 2.55852938F * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) );
-            else rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] + 3.44697F * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) );
-        }
-    }
-               
-    // for (i_0 = 0; i_0 < 22; i_0++) {
-    //     // Product: '<S1>/Matrix Multiply' incorporates:
-    //     //   Inport: '<Root>/F_Z_N'
-    //     //   Inport: '<Root>/L_NM'
-    //     //   Inport: '<Root>/M_NM'
-    //     //   Inport: '<Root>/N_NM'
-
-    //     rtb_CTz_Lookup_p = rtb_Binv[i_0 + 66] * arg_N_NM + (rtb_Binv[i_0 + 44] * arg_M_NM + (rtb_Binv[i_0 + 22] * arg_L_NM + rtb_Binv[i_0] * arg_F_Z_N));
-
-    //     // Sqrt: '<Root>/Sqrt' incorporates:
-    //     //   Constant: '<Root>/Constant'
-    //     //   Gain: '<S1>/Gain3'
-    //     //   Math: '<Root>/Square'
-    //     //   Sum: '<Root>/Sum'
-
-    //     rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0]);
+    //         rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] * (throttle_thrust/_throttle_trim));
+    //         //rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0]);
+    //     }
     // }
+    // else//throttle_thrust > _throttle_trim
+    // { 
+    //     for (i_0 = 0; i_0 < 22; i_0++)
+    //     {
+    //         // Product: '<S1>/Matrix Multiply' incorporates:
+    //         //   Inport: '<Root>/F_Z_N'
+    //         //   Inport: '<Root>/L_NM'
+    //         //   Inport: '<Root>/M_NM'
+    //         //   Inport: '<Root>/N_NM'
+
+    //         rtb_CTz_Lookup_p = rtb_Binv[i_0 + 66] * arg_N_NM + (rtb_Binv[i_0 + 44] * arg_M_NM + (rtb_Binv[i_0 + 22] * arg_L_NM + rtb_Binv[i_0] * arg_F_Z_N));
+
+    //         // Sqrt: '<Root>/Sqrt' incorporates:
+    //         //   Constant: '<Root>/Constant'
+    //         //   Gain: '<S1>/Gain3'
+    //         //   Math: '<Root>/Square'
+    //         //   Sum: '<Root>/Sum'
+
+    //         if(i_0==0||i_0==1||i_0==2||i_0==3||i_0==5||i_0==6||i_0==7||i_0==8)rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] + 4.05F * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) );
+    //         else if(i_0==4||i_0==9)rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] + 2.55852938F * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) );
+    //         else rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] + 3.44697F * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) );
+    //     }
+    // }
+               
+    for (i_0 = 0; i_0 < 22; i_0++) {
+        // Product: '<S1>/Matrix Multiply' incorporates:
+        //   Inport: '<Root>/F_Z_N'
+        //   Inport: '<Root>/L_NM'
+        //   Inport: '<Root>/M_NM'
+        //   Inport: '<Root>/N_NM'
+
+        rtb_CTz_Lookup_p = rtb_Binv[i_0 + 66] * arg_N_NM + (rtb_Binv[i_0 + 44] * arg_M_NM + (rtb_Binv[i_0 + 22] * arg_L_NM + rtb_Binv[i_0] * arg_F_Z_N));
+
+        // Sqrt: '<Root>/Sqrt' incorporates:
+        //   Constant: '<Root>/Constant'
+        //   Gain: '<S1>/Gain3'
+        //   Math: '<Root>/Square'
+        //   Sum: '<Root>/Sum'
+
+        rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0]);
+    }
 
     // SignalConversion generated from: '<Root>/RPM2PWM'
     rtb_CTz_Lookup[0] = rtb_CTx_Lookup[8];
