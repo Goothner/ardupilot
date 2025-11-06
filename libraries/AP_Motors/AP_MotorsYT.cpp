@@ -377,14 +377,16 @@ void AP_MotorsYT::output_armed_stabilizing()
     float arg_L_NM = roll_thrust * radians(_P_DOT_max_degss) * _JXX_kgm2;
     float arg_M_NM = pitch_thrust * radians(_Q_DOT_max_degss) * _JYY_kgm2;
     float arg_N_NM = yaw_thrust * radians(_R_DOT_max_degss) * _JZZ_kgm2;
-    // float arg_F_Z_N = -1.0 * _Mass_kg * 9.8F;
+    float arg_F_Z_N = 0.0F;
     // float arg_F_Z_N = -1.731F;
     // float arg_F_Z_N = -1.731F + throttle_thrust * (_Mass_kg * _H_DDOT_Max_mps2 - (-1.731F) );
     // float arg_F_Z_N = (_Mass_kg * 9.8F * 1.5F) + throttle_thrust * ( (-1.731F) - (_Mass_kg * 9.8F * 1.5F));
-    float arg_F_Z_N = (_Mass_kg * 9.8F * 1.5F) + throttle_thrust * ( (_Mass_kg * _H_DDOT_Max_mps2 * 0.5F) - (_Mass_kg * 9.8F * 1.5F));
-    
+    // float arg_F_Z_N = (_Mass_kg * 9.8F * 1.4F) + throttle_thrust * ( (_Mass_kg * _H_DDOT_Max_mps2 * 1.0F) - (_Mass_kg * 9.8F * 1.4F));
+    if(throttle_thrust < 0.5F)arg_F_Z_N = (_Mass_kg * 9.8F * 1.4F) + throttle_thrust * (-2.0F) * (_Mass_kg * 9.8F * 1.4F);
+    else arg_F_Z_N = -(_Mass_kg * _H_DDOT_Max_mps2) + throttle_thrust * (_Mass_kg * _H_DDOT_Max_mps2) * 2.0F;
+
     hal.console->printf("\n\n Input r= %.2f, p= %.2f, y= %.2f, t= %.2f \n\n", roll_thrust, pitch_thrust, yaw_thrust, throttle_thrust);
-    hal.console->printf("\n\n Input0.5 L= %.3f, M= %.3f, N= %.3f, Fz= %.3f \n\n", arg_L_NM, arg_M_NM, arg_N_NM, arg_F_Z_N);
+    hal.console->printf("\n\n InputLin L= %.3f, M= %.3f, N= %.3f, Fz= %.3f \n\n", arg_L_NM, arg_M_NM, arg_N_NM, arg_F_Z_N);
    
     // if(throttle_thrust < _throttle_trim)
     // {
