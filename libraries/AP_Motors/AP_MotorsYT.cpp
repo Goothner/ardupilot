@@ -383,11 +383,64 @@ void AP_MotorsYT::output_armed_stabilizing()
     float arg_L_NM = roll_thrust * radians(_P_DOT_max_degss) * _JXX_kgm2;
     float arg_M_NM = pitch_thrust * radians(_Q_DOT_max_degss) * _JYY_kgm2;
     float arg_N_NM = yaw_thrust * radians(_R_DOT_max_degss) * _JZZ_kgm2;
-    //float arg_F_Z_N = -1.0 * _Mass_kg * 9.8F;
-    float arg_F_Z_N = -1.731F;
+    float arg_F_Z_N = 0.0F;
+    // float arg_F_Z_N = -1.731F;
+    // float arg_F_Z_N = -1.731F + throttle_thrust * (_Mass_kg * _H_DDOT_Max_mps2 - (-1.731F) );
+    // float arg_F_Z_N = (_Mass_kg * 9.8F * 1.5F) + throttle_thrust * ( (-1.731F) - (_Mass_kg * 9.8F * 1.5F));
+    // float arg_F_Z_N = (_Mass_kg * 9.8F * 1.4F) + throttle_thrust * ( (_Mass_kg * _H_DDOT_Max_mps2 * 1.0F) - (_Mass_kg * 9.8F * 1.4F));
+    if(throttle_thrust < 0.5F)arg_F_Z_N = (_Mass_kg * 9.8F * 1.4F) + throttle_thrust * (-2.0F) * (_Mass_kg * 9.8F * 1.4F);
+    else arg_F_Z_N = -(_Mass_kg * _H_DDOT_Max_mps2) + throttle_thrust * (_Mass_kg * _H_DDOT_Max_mps2) * 2.0F;
 
-    //hal.console->printf("\n\n Input r= %.2f, p= %.2f, y= %.2f, t= %.2f \n\n", roll_thrust, pitch_thrust, yaw_thrust, throttle_thrust);
+    hal.console->printf("\n\n Input r= %.2f, p= %.2f, y= %.2f, t= %.2f \n\n", roll_thrust, pitch_thrust, yaw_thrust, throttle_thrust);
+    hal.console->printf("\n\n InputLin L= %.3f, M= %.3f, N= %.3f, Fz= %.3f \n\n", arg_L_NM, arg_M_NM, arg_N_NM, arg_F_Z_N);
+   
+    // if(throttle_thrust < _throttle_trim)
+    // {
+    //     for (i_0 = 0; i_0 < 22; i_0++)
+    //     {
+    //         // Product: '<S1>/Matrix Multiply' incorporates:
+    //         //   Inport: '<Root>/F_Z_N'
+    //         //   Inport: '<Root>/L_NM'
+    //         //   Inport: '<Root>/M_NM'
+    //         //   Inport: '<Root>/N_NM'
 
+    //         rtb_CTz_Lookup_p = rtb_Binv[i_0 + 66] * arg_N_NM + (rtb_Binv[i_0 + 44] * arg_M_NM + (rtb_Binv[i_0 + 22] * arg_L_NM + rtb_Binv[i_0] * arg_F_Z_N));
+
+    //         // Sqrt: '<Root>/Sqrt' incorporates:
+    //         //   Constant: '<Root>/Constant'
+    //         //   Gain: '<S1>/Gain3'
+    //         //   Math: '<Root>/Square'
+    //         //   Sum: '<Root>/Sum'
+
+            
+    //         rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] * (throttle_thrust/_throttle_trim));
+    //         //rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0]);
+    //     }
+    // }
+    // else//throttle_thrust > _throttle_trim
+    // { 
+    //     for (i_0 = 0; i_0 < 22; i_0++)
+    //     {
+    //         // Product: '<S1>/Matrix Multiply' incorporates:
+    //         //   Inport: '<Root>/F_Z_N'
+    //         //   Inport: '<Root>/L_NM'
+    //         //   Inport: '<Root>/M_NM'
+    //         //   Inport: '<Root>/N_NM'
+
+    //         rtb_CTz_Lookup_p = rtb_Binv[i_0 + 66] * arg_N_NM + (rtb_Binv[i_0 + 44] * arg_M_NM + (rtb_Binv[i_0 + 22] * arg_L_NM + rtb_Binv[i_0] * arg_F_Z_N));
+
+    //         // Sqrt: '<Root>/Sqrt' incorporates:
+    //         //   Constant: '<Root>/Constant'
+    //         //   Gain: '<S1>/Gain3'
+    //         //   Math: '<Root>/Square'
+    //         //   Sum: '<Root>/Sum'
+
+    //         if(i_0==0||i_0==1||i_0==2||i_0==3||i_0==5||i_0==6||i_0==7||i_0==8)rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] + 4.05F * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) );
+    //         else if(i_0==4||i_0==9)rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] + 2.55852938F * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) );
+    //         else rtb_CTx_Lookup[i_0] = safe_sqrt(_Gain3_Gain * rtb_CTz_Lookup_p + _W_TRIM_RPM[i_0] * _W_TRIM_RPM[i_0] + 3.44697F * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) );
+    //     }
+    // }
+    
     for (r = 0; r < 20; r++) {
         // MATLAB Function: '<S1>/MATLAB Function'
         vcol = r << 2;
@@ -565,12 +618,17 @@ void AP_MotorsYT::output_armed_stabilizing()
     const float throttle_thrust_best_plus_adj = throttle_thrust_best_rpy + thr_adj;
     for (r = 0; r < AP_MOTORS_MAX_NUM_MOTORS; r++) {
         if (motor_enabled[r]) {
-            if(throttle_thrust > _throttle_trim){
+            if(throttle_thrust < _throttle_trim){
                 _thrust_rpyt_out[r] = (throttle_thrust_best_plus_adj * _throttle_factor[r]) + (rpy_scale * _thrust_rpyt_out[r]);
-                _thrust_rpyt_out[r] = constrain_float(look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U) + _thrust_trim[r] + (1-_thrust_trim[11]) * (throttle_thrust-_throttle_trim) / (1-_throttle_trim) * (r<8?1.107F:((r==8||r==9||r==18||r==19)?1.0F:1.131F)), 0.0F, 1.0F);
+                //_thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U) * (throttle_thrust/_throttle_trim), 0.0F, 1.0F);
+                _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
+                if(r==0)hal.console->printf("\n\n throttle_thrust < %.2f \n\n", _throttle_trim);
             }
-            // _thrust_rpyt_out[r] = (throttle_thrust_best_plus_adj * _throttle_factor[r]) + (rpy_scale * _thrust_rpyt_out[r]);
-            _thrust_rpyt_out[r] = constrain_float(look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U) + _thrust_trim[r] * throttle_thrust / _throttle_trim, 0.0, 1.0);
+            else{
+                _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
+                if(r==0)hal.console->printf("\n\n throttle_thrust > %.2f \n\n", _throttle_trim);
+            }
+
         }
     }
 
