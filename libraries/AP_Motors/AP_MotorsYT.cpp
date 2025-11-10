@@ -216,128 +216,100 @@ float AP_MotorsYT::boost_ratio(float boost_value, float normal_value) const
 // includes new scaling stability patch
 void AP_MotorsYT::output_armed_stabilizing()
 {
-    float X[80];//float
-    float A[80];
+    float X[80];
     float V[16];
-    int32_t r;//int32_t
+    int32_t r;
     int32_t vcol;
     float U[80];
-    bool p;//bool
+    float rtb_VectorConcatenate[4];//rtb_VectorConcatenate
+    int32_t j;
     float absx;
     int32_t ar;
     int32_t ia;
     int32_t b;
     int32_t ib;
     int32_t b_ic;
-    float rtb_VectorConcatenate[4];
-    float rtb_CTz_Lookup[20];
-    float rtb_CTx_Lookup[20];
-    float rtb_CTz_Lookup_i;
-    int32_t A_tmp;
-    for (vcol = 0; vcol < 20; vcol++) {
-        // Lookup_n-D: '<S1>/CTx_Lookup' incorporates:
-        //   Constant: '<Root>/DF_DEG'
-
-        absx = look1_iflf_binlxpw(_DF_DEG_Value[vcol], _CTx_Lookup_bp01Data, _CTx_Lookup_tableData, 1U);
-
-        // Lookup_n-D: '<S1>/CTz_Lookup' incorporates:
-        //   Constant: '<Root>/DF_DEG'
-
-        rtb_CTz_Lookup_i = look1_iflf_binlxpw(_DF_DEG_Value[vcol], _CTz_Lookup_bp01Data, _CTz_Lookup_tableData, 1U);
-
-        // MATLAB Function: '<S1>/MATLAB Function' incorporates:
-        //   Constant: '<Root>/DF_DEG'
-        //   Constant: '<S1>/Constant'// Expression: vehicle.DUCT.RotDir       //  Referenced by: '<S1>/Constant'
-        //   Constant: '<S1>/Constant1'// Expression: vehicle.DUCT.LeverArm_m  //  Referenced by: '<S1>/Constant1'
-        //   Lookup_n-D: '<S1>/CQ_Lookup'
-
-        A[vcol] = -rtb_CTz_Lookup_i;
-        A_tmp = 3 * vcol + 1;
-        A[vcol + 20] = _vehicle_DUCT_LeverArm_m[A_tmp] *
-        -rtb_CTz_Lookup_i + _vehicle_DUCT_RotDir[vcol] *
-        look1_iflf_binlxpw(_DF_DEG_Value[vcol],
-                            _CQ_Lookup_bp01Data,
-                            _CQ_Lookup_tableData, 1U);
-        A[vcol + 40] = _vehicle_DUCT_LeverArm_m[3 * vcol + 2]
-        * absx + _vehicle_DUCT_LeverArm_m[3 * vcol] *
-        rtb_CTz_Lookup_i;
-        A[vcol + 60] = _vehicle_DUCT_LeverArm_m[A_tmp] *
-        -absx;
-
-        // Lookup_n-D: '<S1>/CTz_Lookup'
-        rtb_CTz_Lookup[vcol] = rtb_CTz_Lookup_i;
-    }
+    float rtb_Sqrt[20];
+    float rtb_W_CMD_RPM[20];
+    float X_0;
+    static const float A[80] = { -0.46432882, -0.46432882, -0.46432882,
+        -0.46432882, -0.46432882, -0.46432882, -0.46432882, -0.46432882, -0.4661,
+        -0.4661, -0.4661, -0.4661, -0.4392, -0.4392, -0.4661, -0.4661, -0.4661,
+        -0.4661, -0.4392, -0.4392, -0.07008187232, -0.12818653382, -0.13973119532,
+        -0.19783585682000002, 0.07008187232, 0.12818653382, 0.13973119532,
+        0.19783585682000002, -0.046622500000000004, -0.10486000000000001,
+        -0.11653750000000003, -0.174775, -0.17501999999999998, -0.23124,
+        0.046622500000000004, 0.10486000000000001, 0.11653750000000003, 0.174775,
+        0.17501999999999998, 0.23124, 0.20569766726, 0.20569766726, 0.20569766726,
+        0.20569766726, 0.20569766726, 0.20569766726, 0.20569766726, 0.20569766726,
+        -0.16173669999999998, -0.16173669999999998, -0.16173669999999998,
+        -0.16173669999999998, -0.1524024, -0.1524024, -0.16173669999999998,
+        -0.16173669999999998, -0.16173669999999998, -0.16173669999999998, -0.1524024,
+        -0.1524024, 0.010519976560000002, 0.0073302265600000017,
+        0.0041404765600000018, 0.00095072656000000019, -0.025490536560000002,
+        -0.028680286560000004, -0.03187003656, -0.03505978656, -0.00531625,
+        -0.008506, -0.011695750000000001, -0.014885499999999998, -0.07752, -0.0912,
+        0.00531625, 0.008506, 0.011695750000000001, 0.014885499999999998, 0.07752,
+        0.0912 };
 
     // MATLAB Function: '<S1>/MATLAB Function'
-    p = true;
-    for (vcol = 0; vcol < 80; vcol++) {
-        X[vcol] = 0.0F;
-        p = (p && ((!rtIsInfF(A[vcol])) && (!rtIsNaNF(A[vcol]))));
-    }
-
-    if (!p) {
-        for (r = 0; r < 80; r++) {
-        //X[r] = (rtNaNF);
-        char buf[0];
-        hal.util->snprintf(buf, sizeof(buf),"\n\n NaN Or INF occured on X!!\n\n");
-        }
+    std::fill(X, X + 80, 0.0f);
+    _svd(A, U, rtb_VectorConcatenate, V);
+    absx = std::abs(rtb_VectorConcatenate[0]);
+    if ((!rtIsInfF(absx)) && (!rtIsNaNF(absx))) {
+        if (absx <= 1.17549435E-38F) 
+            {
+                absx = 1.4013E-45F;
+            }
+            else {
+                int rr;
+                frexpf(absx, &rr);
+                absx = ldexpf(1.0F, rr - 24);
+            }
     } else {
-        _svd(A, U, rtb_VectorConcatenate, V);
-        absx = std::abs(rtb_VectorConcatenate[0]);
-        if ((!rtIsInfF(absx)) && (!rtIsNaNF(absx))) {
-            if (absx <= 1.17549435E-38F) {
-             absx = 1.4013E-45F;
-        } 
-        else {
-            int rr;
-            frexpf(absx, &rr);
-            absx = ldexpf(1.0F, rr - 24);
-        }
-        } else {
         //absx = (rtNaNF);
         char buf[0];
         hal.util->snprintf(buf, sizeof(buf),"\n\n NaN Or INF occured on absx!!\n\n");
-        }
+    }
 
-        absx *= 20.0F;
-        r = -1;
-        vcol = 0;
-        while ((vcol < 4) && (rtb_VectorConcatenate[vcol] > absx)) {
+    absx *= 20.0;
+    r = -1;
+    vcol = 0;
+    while ((vcol < 4) && (rtb_VectorConcatenate[vcol] > absx)) {
         r++;
         vcol++;
+    }
+
+    if (r + 1 > 0) {
+        vcol = 0;
+        for (j = 0; j <= r; j++) {
+        absx = 1.0 / rtb_VectorConcatenate[j];
+        for (ar = vcol; ar < vcol + 4; ar++) {
+            V[ar] *= absx;
         }
 
-        if (r + 1 > 0) {
-        vcol = 0;
-        for (A_tmp = 0; A_tmp <= r; A_tmp++) {
-            absx = 1.0F / rtb_VectorConcatenate[A_tmp];
-            for (ar = vcol; ar < vcol + 4; ar++) {
-            V[ar] *= absx;
-            }
-
-            vcol += 4;
+        vcol += 4;
         }
 
         for (vcol = 0; vcol <= 77; vcol += 4) {
-            for (A_tmp = vcol; A_tmp < vcol + 4; A_tmp++) {
-            X[A_tmp] = 0.0F;
-            }
+        for (j = vcol; j < vcol + 4; j++) {
+            X[j] = 0.0;
+        }
         }
 
         vcol = 0;
-        for (A_tmp = 0; A_tmp <= 77; A_tmp += 4) {
-            ar = -1;
-            vcol++;
-            b = 20 * r + vcol;
-            for (ib = vcol; ib <= b; ib += 20) {
+        for (j = 0; j <= 77; j += 4) {
+        ar = -1;
+        vcol++;
+        b = 20 * r + vcol;
+        for (ib = vcol; ib <= b; ib += 20) {
             ia = ar;
-            for (b_ic = A_tmp; b_ic < A_tmp + 4; b_ic++) {
-                ia++;
-                X[b_ic] += U[ib - 1] * V[ia];
+            for (b_ic = j; b_ic < j + 4; b_ic++) {
+            ia++;
+            X[b_ic] += U[ib - 1] * V[ia];
             }
 
             ar += 4;
-            }
         }
         }
     }
@@ -452,36 +424,40 @@ void AP_MotorsYT::output_armed_stabilizing()
         //   Inport: '<Root>/N_NM'
         //   MATLAB Function: '<S1>/MATLAB Function'
 
-        absx = X[vcol + 3] * arg_N_NM + (X[vcol + 2] * arg_M_NM + (X[vcol + 1] * arg_L_NM + X[vcol] * arg_F_Z_N));
+        X_0 = X[vcol + 3] *
+        arg_N_NM + (X[vcol + 2]
+        * arg_M_NM + (X[vcol + 1]
+        * arg_L_NM + X[vcol] *
+        arg_F_Z_N));
 
         // Sqrt: '<Root>/Sqrt' incorporates:
-        //   Constant: '<Root>/Constant'// float Constant_Value_h[20]; //Expression: CONTBATT.CA.W_TRIM_RPM //Referenced by: '<Root>/Constant'
+        //   Constant: '<Root>/Constant'
         //   Gain: '<S1>/Gain3'
         //   Math: '<Root>/Square'
         //   Sum: '<Root>/Sum'
-        // Expression: CONTBATT.CA.W_TRIM_RPM//  Referenced by: '<Root>/Constant'
 
-        // rtb_CTx_Lookup[r] = safe_sqrt(_Gain3_Gain * absx + _CONTBATT_CA_W_TRIM_RPM[r] * _CONTBATT_CA_W_TRIM_RPM[r]);
-        rtb_CTx_Lookup[r] = safe_sqrt(_Gain3_Gain * absx);
+        rtb_Sqrt[r] = safe_sqrt(_Gain3_Gain * X_0 +
+        _CONTBATT_CA_W_TRIM_RPM[r] *
+        _CONTBATT_CA_W_TRIM_RPM[r]);
     }
 
     // SignalConversion generated from: '<Root>/RPM2PWM'
-    rtb_CTz_Lookup[0] = rtb_CTx_Lookup[7];
-    rtb_CTz_Lookup[1] = rtb_CTx_Lookup[6];
-    rtb_CTz_Lookup[2] = rtb_CTx_Lookup[5];
-    rtb_CTz_Lookup[3] = rtb_CTx_Lookup[4];
-    rtb_CTz_Lookup[4] = rtb_CTx_Lookup[0];
-    rtb_CTz_Lookup[5] = rtb_CTx_Lookup[1];
-    rtb_CTz_Lookup[6] = rtb_CTx_Lookup[2];
-    rtb_CTz_Lookup[7] = rtb_CTx_Lookup[3];
-    rtb_CTz_Lookup[8] = rtb_CTx_Lookup[13];
-    rtb_CTz_Lookup[9] = rtb_CTx_Lookup[12];
-    rtb_CTz_Lookup[10] = rtb_CTx_Lookup[11];
-    rtb_CTz_Lookup[11] = rtb_CTx_Lookup[10];
-    rtb_CTz_Lookup[12] = rtb_CTx_Lookup[9];
-    rtb_CTz_Lookup[13] = rtb_CTx_Lookup[8];
+    rtb_W_CMD_RPM[0] = rtb_Sqrt[7];
+    rtb_W_CMD_RPM[1] = rtb_Sqrt[6];
+    rtb_W_CMD_RPM[2] = rtb_Sqrt[5];
+    rtb_W_CMD_RPM[3] = rtb_Sqrt[4];
+    rtb_W_CMD_RPM[4] = rtb_Sqrt[0];
+    rtb_W_CMD_RPM[5] = rtb_Sqrt[1];
+    rtb_W_CMD_RPM[6] = rtb_Sqrt[2];
+    rtb_W_CMD_RPM[7] = rtb_Sqrt[3];
+    rtb_W_CMD_RPM[8] = rtb_Sqrt[13];
+    rtb_W_CMD_RPM[9] = rtb_Sqrt[12];
+    rtb_W_CMD_RPM[10] = rtb_Sqrt[11];
+    rtb_W_CMD_RPM[11] = rtb_Sqrt[10];
+    rtb_W_CMD_RPM[12] = rtb_Sqrt[9];
+    rtb_W_CMD_RPM[13] = rtb_Sqrt[8];
     for (r = 0; r < 6; r++) {
-        rtb_CTz_Lookup[r + 14] = rtb_CTx_Lookup[r + 14];
+        rtb_W_CMD_RPM[r + 14] = rtb_Sqrt[r + 14];
     }
 
     // End of SignalConversion generated from: '<Root>/RPM2PWM'
@@ -621,11 +597,11 @@ void AP_MotorsYT::output_armed_stabilizing()
             if(throttle_thrust < _throttle_trim){
                 _thrust_rpyt_out[r] = (throttle_thrust_best_plus_adj * _throttle_factor[r]) + (rpy_scale * _thrust_rpyt_out[r]);
                 //_thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U) * (throttle_thrust/_throttle_trim), 0.0F, 1.0F);
-                _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
+                _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_W_CMD_RPM[r], _RPM2PWM_bp01Data,_RPM2PWM_tableData, 10U), 0.0F, 1.0F);
                 if(r==0)hal.console->printf("\n\n throttle_thrust < %.2f \n\n", _throttle_trim);
             }
             else{
-                _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
+                _thrust_rpyt_out[r] = constrain_float( look1_iflf_binlxpw(rtb_W_CMD_RPM[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
                 if(r==0)hal.console->printf("\n\n throttle_thrust > %.2f \n\n", _throttle_trim);
             }
 
