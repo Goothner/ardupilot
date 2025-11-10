@@ -169,15 +169,15 @@ private:
     // YTMath functions
     float look1_iflf_binlxpw(float u0, const float bp0[], const float table[], uint32_t maxIndex);
     float xnrm2(int32_t n, const float *x, int32_t ix0);//float xnrm2(int32_t n, const float x[80], int32_t ix0);
-    float xnrm2_j(int32_t n, const float *x, int32_t ix0);//float xnrm2_j(int32_t n, const float x[4], int32_t ix0);
-    void xaxpy_m0(int32_t n, float a, const float *x, int32_t ix0, float *y, int32_t iy0);//void xaxpy_m0(int32_t n, float a, const float x[20], int32_t ix0, float y[80], int32_t iy0);
+    //float xnrm2_j(int32_t n, const float *x, int32_t ix0);//float xnrm2_j(int32_t n, const float x[4], int32_t ix0);
+    //void xaxpy_m0(int32_t n, float a, const float *x, int32_t ix0, float *y, int32_t iy0);//void xaxpy_m0(int32_t n, float a, const float x[20], int32_t ix0, float y[80], int32_t iy0);
     void xaxpy_m(int32_t n, float a, const float *x, int32_t ix0, float *y, int32_t iy0);//void AP_MotorsYT::xaxpy_m(int32_t n, float a, const float x[80], int32_t ix0, float y[20], int32_t iy0)
-    float xdotc(int32_t n, const float x[80], int32_t ix0, const float y[80], int32_t iy0);//float xdotc(int32_t n, const float x[80], int32_t ix0, const float y[80], int32_t iy0);
-    void xaxpy(int32_t n, float a, int32_t ix0, float y[80], int32_t iy0);//void xaxpy(int32_t n, float a, int32_t ix0, float y[80], int32_t iy0);
-    float xdotc_e(int32_t n, const float x[16], int32_t ix0,const float y[16], int32_t iy0);//float xdotc_e(int32_t n, const float x[16], int32_t ix0,const float y[16], int32_t iy0);
-    void xaxpy_m0a(int32_t n, float a, int32_t ix0, float y[16], int32_t iy0);//void xaxpy_m0a(int32_t n, float a, int32_t ix0, float y[16], int32_t iy0);
-    void xscal(float a, float x[80], int32_t ix0);//void xscal(float a, float x[80], int32_t ix0);
-    void xscal_c(float a, float x[16], int32_t ix0);//void xscal_c(float a, float x[16], int32_t ix0);
+    float xdotc(int32_t n, const float *x, int32_t ix0, const float *y, int32_t iy0);//float xdotc(int32_t n, const float x[80], int32_t ix0, const float y[80], int32_t iy0);
+    void xaxpy(int32_t n, float a, int32_t ix0, float *y, int32_t iy0);//void xaxpy(int32_t n, float a, int32_t ix0, float y[80], int32_t iy0);
+    //float xdotc_e(int32_t n, const float *x, int32_t ix0,const float *y, int32_t iy0);//float xdotc_e(int32_t n, const float x[16], int32_t ix0,const float y[16], int32_t iy0);
+    // void xaxpy_m0a(int32_t n, float a, int32_t ix0, float *y, int32_t iy0);//void xaxpy_m0a(int32_t n, float a, int32_t ix0, float y[16], int32_t iy0);
+    void xscal(float a, float *x, int32_t len, int32_t ix0);//void xscal(float a, float x[80], int32_t ix0);
+    void xscal_c(float a, float *x, int32_t len, int32_t ix0);//void xscal_c(float a, float x[16], int32_t ix0);
     void xswap(float x[16], int32_t ix0, int32_t iy0);//void xswap(float x[16], int32_t ix0, int32_t iy0);
     void xswap_m(float x[80], int32_t ix0, int32_t iy0);//void xswap_m(float x[80], int32_t ix0, int32_t iy0);
     void xrotg(float *a, float *b, float *c, float *s);

@@ -103,57 +103,57 @@ float AP_MotorsYT::xnrm2(int32_t n, const float* x, int32_t ix0)
   return y;
 }
 
-// Function for MATLAB Function: '<S1>/MATLAB Function'
-float AP_MotorsYT::xnrm2_j(int32_t n, const float* x, int32_t ix0)
-{
-  float y;
-  float scale;
-  int32_t kend;
-  float absxk;
-  float t;
-  int32_t k;
-  y = 0.0F;
-  if (n >= 1) {
-    if (n == 1) {
-      y = fabsf(x[ix0 - 1]);
-    } else {
-      scale = 1.29246971E-26F;
-      kend = (ix0 + n) - 1;
-      for (k = ix0; k <= kend; k++) {
-        absxk = fabsf(x[k - 1]);
-        if (absxk > scale) {
-          t = scale / absxk;
-          y = y * t * t + 1.0F;
-          scale = absxk;
-        } else {
-          t = absxk / scale;
-          y += t * t;
-        }
-      }
+// // Function for MATLAB Function: '<S1>/MATLAB Function'
+// float AP_MotorsYT::xnrm2_j(int32_t n, const float* x, int32_t ix0)
+// {
+//   float y;
+//   float scale;
+//   int32_t kend;
+//   float absxk;
+//   float t;
+//   int32_t k;
+//   y = 0.0F;
+//   if (n >= 1) {
+//     if (n == 1) {
+//       y = fabsf(x[ix0 - 1]);
+//     } else {
+//       scale = 1.29246971E-26F;
+//       kend = (ix0 + n) - 1;
+//       for (k = ix0; k <= kend; k++) {
+//         absxk = fabsf(x[k - 1]);
+//         if (absxk > scale) {
+//           t = scale / absxk;
+//           y = y * t * t + 1.0F;
+//           scale = absxk;
+//         } else {
+//           t = absxk / scale;
+//           y += t * t;
+//         }
+//       }
 
-      y = scale * safe_sqrt(y);
-    }
-  }
+//       y = scale * safe_sqrt(y);
+//     }
+//   }
 
-  return y;
-}
+//   return y;
+// }
 
-// Function for MATLAB Function: '<S1>/MATLAB Function'
-void AP_MotorsYT::xaxpy_m0(int32_t n, float a, const float* x, int32_t ix0, float* y, int32_t iy0)
-{
-  int32_t ix;
-  int32_t iy;
-  int32_t k;
-  if ((n >= 1) && !is_zero(a)) {//(!(a == 0.0F))
-    ix = ix0 - 1;
-    iy = iy0 - 1;
-    for (k = 0; k < n; k++) {
-      y[iy] += a * x[ix];
-      ix++;
-      iy++;
-    }
-  }
-}
+// // Function for MATLAB Function: '<S1>/MATLAB Function'
+// void AP_MotorsYT::xaxpy_m0(int32_t n, float a, const float* x, int32_t ix0, float* y, int32_t iy0)
+// {
+//   int32_t ix;
+//   int32_t iy;
+//   int32_t k;
+//   if ((n >= 1) && !is_zero(a)) {//(!(a == 0.0F))
+//     ix = ix0 - 1;
+//     iy = iy0 - 1;
+//     for (k = 0; k < n; k++) {
+//       y[iy] += a * x[ix];
+//       ix++;
+//       iy++;
+//     }
+//   }
+// }
 
 // Function for MATLAB Function: '<S1>/MATLAB Function'
 void AP_MotorsYT::xaxpy_m(int32_t n, float a, const float* x, int32_t ix0, float* y, int32_t iy0)
@@ -173,7 +173,7 @@ void AP_MotorsYT::xaxpy_m(int32_t n, float a, const float* x, int32_t ix0, float
 }
 
 // Function for MATLAB Function: '<S1>/MATLAB Function'
-float AP_MotorsYT::xdotc(int32_t n, const float x[80], int32_t ix0, const float y[80], int32_t iy0)
+float AP_MotorsYT::xdotc(int32_t n, const float* x, int32_t ix0, const float* y, int32_t iy0)
 {
   float d;
   int32_t ix;
@@ -193,8 +193,29 @@ float AP_MotorsYT::xdotc(int32_t n, const float x[80], int32_t ix0, const float 
   return d;
 }
 
+// // Function for MATLAB Function: '<S1>/MATLAB Function'
+// float AP_MotorsYT::xdotc_e(int32_t n, const float* x, int32_t ix0,const float* y, int32_t iy0)
+// {
+//   float d;
+//   int32_t ix;
+//   int32_t iy;
+//   int32_t k;
+//   d = 0.0F;
+//   if (n >= 1) {
+//     ix = ix0;
+//     iy = iy0;
+//     for (k = 0; k < n; k++) {
+//       d += x[ix - 1] * y[iy - 1];
+//       ix++;
+//       iy++;
+//     }
+//   }
+
+//   return d;
+// }
+
 // Function for MATLAB Function: '<S1>/MATLAB Function'
-void AP_MotorsYT::xaxpy(int32_t n, float a, int32_t ix0, float y[80], int32_t iy0)
+void AP_MotorsYT::xaxpy(int32_t n, float a, int32_t ix0, float* y, int32_t iy0)
 {
   int32_t ix;
   int32_t iy;
@@ -210,58 +231,39 @@ void AP_MotorsYT::xaxpy(int32_t n, float a, int32_t ix0, float y[80], int32_t iy
   }
 }
 
-// Function for MATLAB Function: '<S1>/MATLAB Function'
-float AP_MotorsYT::xdotc_e(int32_t n, const float x[16], int32_t ix0,const float y[16], int32_t iy0)
-{
-  float d;
-  int32_t ix;
-  int32_t iy;
-  int32_t k;
-  d = 0.0F;
-  if (n >= 1) {
-    ix = ix0;
-    iy = iy0;
-    for (k = 0; k < n; k++) {
-      d += x[ix - 1] * y[iy - 1];
-      ix++;
-      iy++;
-    }
-  }
-
-  return d;
-}
+// // Function for MATLAB Function: '<S1>/MATLAB Function'
+// void AP_MotorsYT::xaxpy_m0a(int32_t n, float a, int32_t ix0, float* y, int32_t iy0)
+// {
+//   int32_t ix;
+//   int32_t iy;
+//   int32_t k;
+//   if ((n >= 1) && !is_zero(a)) {//(!(a == 0.0F))
+//     ix = ix0 - 1;
+//     iy = iy0 - 1;
+//     for (k = 0; k < n; k++) {
+//       y[iy] += a * y[ix];
+//       ix++;
+//       iy++;
+//     }
+//   }
+// }
 
 // Function for MATLAB Function: '<S1>/MATLAB Function'
-void AP_MotorsYT::xaxpy_m0a(int32_t n, float a, int32_t ix0, float y[16], int32_t iy0)
-{
-  int32_t ix;
-  int32_t iy;
-  int32_t k;
-  if ((n >= 1) && !is_zero(a)) {//(!(a == 0.0F))
-    ix = ix0 - 1;
-    iy = iy0 - 1;
-    for (k = 0; k < n; k++) {
-      y[iy] += a * y[ix];
-      ix++;
-      iy++;
-    }
-  }
-}
-
-// Function for MATLAB Function: '<S1>/MATLAB Function'
-void AP_MotorsYT::xscal(float a, float x[80], int32_t ix0)
+void AP_MotorsYT::xscal(float a, float* x, int32_t len, int32_t ix0)
 {
   int32_t k;
-  for (k = ix0; k <= ix0 + 19; k++) {
+  int32_t count = (len/4) -1;
+  for (k = ix0; k <= ix0 + count; k++) {
     x[k - 1] *= a;
   }
 }
 
 // Function for MATLAB Function: '<S1>/MATLAB Function'
-void AP_MotorsYT::xscal_c(float a, float x[16], int32_t ix0)
+void AP_MotorsYT::xscal_c(float a, float* x, int32_t len, int32_t ix0)
 {
   int32_t k;
-  for (k = ix0; k <= ix0 + 3; k++) {
+  int32_t count = (len/4) -1;
+  for (k = ix0; k <= ix0 + count; k++) {
     x[k - 1] *= a;
   }
 }
@@ -473,7 +475,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     U[m] = b_A[m];
   }
 
-  nrm = xnrm2_j(3, e, 2);
+  nrm = xnrm2(3, e, 2);//xnrm2_j
   if (is_zero(nrm)) {
     e[0] = 0.0F;
   } else {
@@ -506,7 +508,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     }
 
     for (m = 1; m + 1 < 5; m++) {
-      xaxpy_m0(19, -e[m] / e[1], work, 2, b_A, 20 * m + 2);
+      xaxpy_m(19, -e[m] / e[1], work, 2, b_A, 20 * m + 2);//xaxpy_m0
     }
   }
 
@@ -555,7 +557,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     U[m + 20] = b_A[m + 20];
   }
 
-  nrm = xnrm2_j(2, e, 3);
+  nrm = xnrm2(2, e, 3);//xnrm2_j
   if (is_zero(nrm)) {//(nrm == 0.0F)
     e[1] = 0.0F;
   } else {
@@ -588,7 +590,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     }
 
     for (m = 2; m + 1 < 5; m++) {
-      xaxpy_m0(18, -e[m] / e[2], work, 3, b_A, 20 * m + 3);
+      xaxpy_m(18, -e[m] / e[2], work, 3, b_A, 20 * m + 3);//xaxpy_m0
     }
   }
 
@@ -699,8 +701,8 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
       qq = ((c_q << 2) + c_q) + 2;
       for (qjj = c_q + 1; qjj + 1 < 5; qjj++) {
         qp1jj = ((qjj << 2) + c_q) + 2;
-        xaxpy_m0a(3 - c_q,
-          -(xdotc_e(3 - c_q, Vf, qq, Vf, qp1jj) / Vf[qq
+        xaxpy(3 - c_q,//xaxpy_m0a
+          -(xdotc(3 - c_q, Vf, qq, Vf, qp1jj) / Vf[qq//xdotc_e
             - 1]), qq, Vf, qp1jj);
       }
     }
@@ -719,7 +721,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     nrm = b_s[0] / rt;
     b_s[0] = rt;
     ztest0 = e[0] / nrm;
-    xscal(nrm, U, 1);
+    xscal(nrm, U, 80, 1);
   }
 
   if (!is_zero(ztest0)) {//(ztest0 != 0.0F) 
@@ -727,7 +729,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     nrm = rt / ztest0;
     ztest0 = rt;
     b_s[1] *= nrm;
-    xscal_c(nrm, Vf, 5);
+    xscal(nrm, Vf, 16, 5);//xscal_c
   }
 
   e[0] = ztest0;
@@ -737,7 +739,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     nrm = b_s[1] / rt;
     b_s[1] = rt;
     ztest0 = e[1] / nrm;
-    xscal(nrm, U, 21);
+    xscal(nrm, U, 80, 21);
   }
 
   if (!is_zero(ztest0)) { //(ztest0 != 0.0F)
@@ -745,7 +747,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     nrm = rt / ztest0;
     ztest0 = rt;
     b_s[2] *= nrm;
-    xscal_c(nrm, Vf, 9);
+    xscal(nrm, Vf, 16, 9);//xscal_c
   }
 
   e[1] = ztest0;
@@ -755,7 +757,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     nrm = b_s[2] / rt;
     b_s[2] = rt;
     ztest0 = b_A[62] / nrm;
-    xscal(nrm, U, 41);
+    xscal(nrm, U, 80, 41);
   }
 
   if (!is_zero(ztest0)) {// (ztest0 != 0.0F)
@@ -763,7 +765,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     nrm = rt / ztest0;
     ztest0 = rt;
     b_s[3] *= nrm;
-    xscal_c(nrm, Vf, 13);
+    xscal(nrm, Vf, 16, 13);//xscal_c
   }
 
   e[2] = ztest0;
@@ -771,7 +773,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
     rt = fabsf(b_s[3]);
     nrm = b_s[3] / rt;
     b_s[3] = rt;
-    xscal(nrm, U, 61);
+    xscal(nrm, U, 80 ,61);
   }
 
   e[3] = 0.0F;
@@ -971,7 +973,7 @@ void AP_MotorsYT::_svd(const float A[80], float U[80], float s[4], float V[16])
      default:
       if (b_s[c_q] < 0.0F) {
         b_s[c_q] = -b_s[c_q];
-        xscal_c(-1.0F, Vf, (c_q << 2) + 1);
+        xscal(-1.0F, Vf, 16, (c_q << 2) + 1);//xscal_c
       }
 
       qq = c_q + 1;
