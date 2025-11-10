@@ -185,13 +185,15 @@ private:
     void _svd(const float A[80], float U[80], float s[4], float V[16]);// void _svd(const float A[80], float U[80], float s[4], float V[16]);
 
     // YTscaled parameters
-    float _P_DOT_max_degss = 7.0F;//7.1
-    float _Q_DOT_max_degss = 19.0F;//19.2
-    float _R_DOT_max_degss = 2.23F;//2.236
-    float _JXX_kgm2 = 1.3F;
-    float _JYY_kgm2 = 12.94F;
-    float _JZZ_kgm2 = 11.64F;
-    float _Mass_kg = 12.9;
+    // YTscaled parameters
+    const float _P_DOT_max_degss = 8.8F;//7.1
+    const float _Q_DOT_max_degss = 22.0F;//19.2
+    const float _R_DOT_max_degss = 5.59F;//2.236
+    const float _JXX_kgm2 = 541.35F;//0.54135186
+    const float _JYY_kgm2 = 190.0F;//0.950637144
+    const float _JZZ_kgm2 = 143.5F;//1.435035916
+    const float _Mass_kg = 12.9F;
+    const float _H_DDOT_Max_mps2 = -0.47F;
 
     float _DF_DEG_Value[20] { 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
     10.0F, 10.0F, 0.0F, 0.0F, 0.0F, 0.0F, 10.0F, 10.0F };
