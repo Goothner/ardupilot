@@ -251,7 +251,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     //hal.console->printf("\n\n NFCY test! %.2f \n\n", nfcytest)
 
     // return what arducopter main controller outputted
-    return Vector3f(constrain_float(arg_P_DOT_CMD/_P_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_R_DOT_CMD/_Q_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_G_B_MPS2/_R_DOT_max_degss, -1.0F, 1.0F));
+    return Vector3f(constrain_float(arg_P_DOT_CMD/_P_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_Q_DOT_CMD/_Q_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_R_DOT_CMD/_R_DOT_max_degss, -1.0F, 1.0F));
 }
 
 // reset controller to avoid build up on the ground
