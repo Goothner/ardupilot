@@ -249,6 +249,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     gcs().send_text(MAV_SEVERITY_INFO, "YT-10:33 input deg: R= %.2f,P= %.2f,Y= %.2f ",arg_ROLL_ATT_CMD_DEG, arg_PITCH_ATT_CMD_DEG, arg_YAW_RATE_CMD_DEGPS);
     //hal.console->printf("\n\n NFCY test! %.2f \n\n", 1.234f);
     //hal.console->printf("\n\n NFCY test! %.2f \n\n", nfcytest)
+    //_motors.set_throttle(throttle_in);
 
     // return what arducopter main controller outputted
     return Vector3f(constrain_float(arg_P_DOT_CMD/_P_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_Q_DOT_CMD/_Q_DOT_max_degss, -1.0F, 1.0F), constrain_float(arg_R_DOT_CMD/_R_DOT_max_degss, -1.0F, 1.0F));

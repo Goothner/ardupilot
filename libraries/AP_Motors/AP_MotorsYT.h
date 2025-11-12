@@ -255,7 +255,14 @@ private:
     const float _thrust_trim [20] { 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 0.6152F, 
         0.6833F, 0.6833F, 0.8018F, 0.8018F, 0.8018F, 0.8018F,
         0.8018F, 0.8018F, 0.8018F, 0.8018F, 0.6833F, 0.6833F };
-    const float _throttle_trim = 0.5;
+    const float _throttle_trim = 0.5F;
+    const float _throttle_takeoff = 0.1536F;
+    const float _throttle_transition1 = 0.3F;
+    const float _throttle_transition2 = 0.35F;
+    const float _boost_max = 1.2F;
+    const float _boost_min = 0.2F;
+    const float _boost_normal = 1.0F;
+    
     const float _RPM2PWM_tableData[11]    // Computed Parameter: RPM2PWM_tableData
                                     //  Referenced by: '<Root>/RPM2PWM'
     { 0.0F, 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F, 0.9F, 1.0F };
