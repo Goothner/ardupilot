@@ -204,7 +204,7 @@ Vector3f AC_CustomControl_YTDT::update(void)
     float arg_YAW_ANGULAR_RATE_REF_K3{ 0.00001F };
 
     // '<Root>/DF_FRR_DEGLIN'
-    double arg_DF_FRR_DEGLIN = 30.0F;
+    float arg_DF_FRR_DEGLIN = 30.0F;
 
     // '<Root>/P_DOT_CMD'
     float arg_P_DOT_CMD;
