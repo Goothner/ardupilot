@@ -633,7 +633,7 @@ void AP_MotorsYT::output_armed_stabilizing()
                 }
                 else{
                     _thrust_rpyt_out_22t[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F) 
-                    * (_boost_normal - (throttle_thrust - _throttle_takeoff) / (_throttle_transition1 - _throttle_takeoff) * (_boost_normal - _boost_min));
+                    * (_boost_max - (throttle_thrust - _throttle_takeoff) / (_throttle_transition1 - _throttle_takeoff) * (_boost_max - _boost_min));
                 }
             }
             //else if(throttle_thrust < _throttle_transition2){
@@ -650,7 +650,7 @@ void AP_MotorsYT::output_armed_stabilizing()
                     _thrust_rpyt_out_22t[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F);
                 }
                 else{
-                    _thrust_rpyt_out_22t[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F) * _boost_normal;
+                    _thrust_rpyt_out_22t[r] = constrain_float( look1_iflf_binlxpw(rtb_CTz_Lookup[r], _RPM2PWM_bp01Data, _RPM2PWM_tableData, 10U), 0.0F, 1.0F) * _boost_max;
                 }
             }
         }

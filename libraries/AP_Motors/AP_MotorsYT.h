@@ -192,7 +192,7 @@ private:
     const float _Q_DOT_max_degss = 22.0F;//19.2
     const float _R_DOT_max_degss = 5.59F;//2.236
     const float _JXX_kgm2 = 541.35F;//0.54135186
-    const float _JYY_kgm2 = 190.0F;//0.950637144
+    const float _JYY_kgm2 = 380.0F;//0.950637144
     const float _JZZ_kgm2 = 143.5F;//1.435035916
     const float _Mass_kg = 12.9F;
     const float _H_DDOT_Max_mps2 = -0.47F;
@@ -237,16 +237,16 @@ private:
     //     -0.34700000000000003F, -0.35000000000000003F, -0.08F, -0.34700000000000003F,
     //     -0.425F, -0.08F, -0.34700000000000003F, -0.5F, -0.08F };
     // //10-26 merge motor 13&14 motor 15&16:
-    const float _vehicle_DUCT_LeverArm_m[66]{ 0.443F, 0.176F, 0.0F, 0.443F, 0.251F, 0.0F, 0.443F, 0.326F, 0.0F, 0.443F, 0.401F, 0.0F, 
-        0.443F, 0.496F, -0.03F, 
-        0.443F, -0.176F, 0.0F, 0.443F, -0.251F, 0.0F, 0.443F, -0.326F, 0.0F, 0.443F, -0.401F, 0.0F, 
-        0.443F, -0.496F, -0.03F, 
-        -0.347F, 0.1625F, -0.08F, -0.347F, 0.1625F, -0.08F, 
-        -0.347F, 0.275F, -0.08F, -0.347F, 0.35F, -0.08F, 
-        -0.347F, 0.425F, -0.08F, -0.347F, 0.5F, -0.08F, 
-        -0.347F, -0.1625F, -0.08F, -0.347F, -0.1625F, -0.08F, 
-        -0.347F, -0.275F, -0.08F, -0.347F, -0.35F, -0.08F, 
-        -0.347F, -0.425F, -0.08F, -0.347F, -0.5F, -0.08F };
+    const float _vehicle_DUCT_LeverArm_m[66]{ 0.463F, 0.176F, 0.0F, 0.463F, 0.251F, 0.0F, 0.463F, 0.326F, 0.0F, 0.463F, 0.401F, 0.0F, 
+        0.463F, 0.496F, -0.03F, 
+        0.463F, -0.176F, 0.0F, 0.463F, -0.251F, 0.0F, 0.463F, -0.326F, 0.0F, 0.463F, -0.401F, 0.0F, 
+        0.463F, -0.496F, -0.03F, 
+        -0.327F, 0.1625F, -0.08F, -0.327F, 0.1625F, -0.08F, 
+        -0.327F, 0.275F, -0.08F, -0.327F, 0.35F, -0.08F, 
+        -0.327F, 0.425F, -0.08F, -0.327F, 0.5F, -0.08F, 
+        -0.327F, -0.1625F, -0.08F, -0.327F, -0.1625F, -0.08F, 
+        -0.327F, -0.275F, -0.08F, -0.327F, -0.35F, -0.08F, 
+        -0.327F, -0.425F, -0.08F, -0.327F, -0.5F, -0.08F };
     const float _Gain3_Gain = 1.0E+8F;
     const float _W_TRIM_RPM[22] { 37920.7656F, 37920.7656F, 37920.7656F, 37920.7656F, 23919.2482F, 37920.7656F,
     37920.7656F, 37920.7656F, 37920.7656F, 23919.2482F, 34621.6641F, 34621.6641F,
@@ -257,9 +257,10 @@ private:
         0.8018F, 0.8018F, 0.8018F, 0.8018F, 0.6833F, 0.6833F };
     const float _throttle_trim = 0.5F;
     const float _throttle_takeoff = 0.1536F;
-    const float _throttle_transition1 = 0.3F;
+    const float _throttle_transition1 = 0.25F;
     const float _throttle_transition2 = 0.35F;
-    const float _boost_max = 1.2F;
+    const float _throttle_transition3 = 0.8F;
+    const float _boost_max = 1.45F;
     const float _boost_min = 0.2F;
     const float _boost_normal = 1.0F;
     

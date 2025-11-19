@@ -388,7 +388,7 @@ class CONFULL_CON_TBATT_CONPARA_VECTORModelClass final
             arg_YAW_ANGULAR_RATE_REF_KFF, const real32_T * const
             arg_YAW_ANGULAR_RATE_REF_ZETA, const real32_T * const
             arg_YAW_ANGULAR_RATE_REF_W0_RADPS, const real32_T * const
-            arg_YAW_ANGULAR_RATE_REF_K3, real_T &arg_DF_FRR_DEGLIN, real32_T
+            arg_YAW_ANGULAR_RATE_REF_K3, real32_T &arg_DF_FRR_DEGLIN, real32_T
             &arg_P_DOT_CMD, real32_T &arg_Q_DOT_CMD, real32_T &arg_R_DOT_CMD,
             real32_T &arg_G_B_MPS2);
 
