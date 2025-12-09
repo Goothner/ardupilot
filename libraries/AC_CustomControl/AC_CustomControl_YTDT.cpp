@@ -11,31 +11,31 @@
 // table of user settable parameters
 const AP_Param::GroupInfo AC_CustomControl_YTDT::var_info[] = {
     // @Param: PARAM1
-    // @DisplayName: YTDT param1
+    // @DisplayName: YTDT _roll_angl_err_kp
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
     AP_GROUPINFO("YT_ROL_ANG_P", 1, AC_CustomControl_YTDT, _roll_angl_err_kp, 2.0f),
 
     // @Param: PARAM2
-    // @DisplayName: YTDT param2
+    // @DisplayName: YTDT _roll_rate_err_kp
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
     AP_GROUPINFO("YT_ROL_RAT_P", 2, AC_CustomControl_YTDT, _roll_rate_err_kp, 2.2f),
 
     // @Param: PARAM3
-    // @DisplayName: YTDT param3
+    // @DisplayName: YTDT _pitch_angl_err_kp
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
     AP_GROUPINFO("YT_PIT_ANG_P", 3, AC_CustomControl_YTDT, _pitch_angl_err_kp, 3.8f),
 
     // @Param: PARAM4
-    // @DisplayName: YTDT param3
+    // @DisplayName: YTDT _pitch_rate_err_kp
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
     AP_GROUPINFO("YT_PIT_RAT_P", 4, AC_CustomControl_YTDT, _pitch_rate_err_kp, 5.0f),
 
     // @Param: PARAM5
-    // @DisplayName: YTDT param3
+    // @DisplayName: YTDT _yaw_rate_err_kp
     // @Description: Dummy parameter for YTDT custom controller backend
     // @User: Advanced
     AP_GROUPINFO("YT_YAW_RAT_P", 5, AC_CustomControl_YTDT, _yaw_rate_err_kp, 1.5f),
