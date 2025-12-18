@@ -192,7 +192,7 @@ private:
     const float _R_DOT_max_degss = 5.59F;//2.236
     const float _JXX_kgm2 = 108.27F;//0.54135186
     const float _JYY_kgm2 = 95.06F;//0.950637144
-    const float _JZZ_kgm2 = 43.0F;//1.435035916
+    const float _JZZ_kgm2 = 43.05F;//1.435035916
     const float _Mass_kg = 13.0F;
     const float _H_DDOT_Max_mps2 = -0.45F;
 
