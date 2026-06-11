@@ -20,7 +20,7 @@
 #if HAL_PICCOLO_CAN_ENABLE
 
 /*
- * Decode a received CAN frame.
+ * Decode a recevied CAN frame.
  * It is assumed at this point that the received frame is intended for *this* ESC
  */
 bool AP_PiccoloCAN_ESC::handle_can_frame(AP_HAL::CANFrame &frame)
@@ -38,21 +38,26 @@ bool AP_PiccoloCAN_ESC::handle_can_frame(AP_HAL::CANFrame &frame)
     addr -= 1;
 
     uint8_t extended;
-
     if (decodeESC_StatusAPacketStructure(&frame, &status.statusA)) {
-        newTelemetry = true;
+        AP_ESC_Telem_Backend::TelemetryData telem {};
+        
         update_rpm(addr, rpm());
+        telem.voltage = voltage();
+        telem.current = current();
+        update_telem_data(addr, telem,
+            AP_ESC_Telem_Backend::TelemetryType::CURRENT |
+            AP_ESC_Telem_Backend::TelemetryType::VOLTAGE);
+        newTelemetry = true;
     } else if (decodeESC_StatusBPacketStructure(&frame, &status.statusB)) {
         AP_ESC_Telem_Backend::TelemetryData telem {};
 
-        telem.voltage = voltage() * 10;
-        telem.current = current() * 10;
+        //telem.voltage = voltage() * 10;
+        //telem.current = current() * 10;
         telem.motor_temp_cdeg = int16_t(motorTemperature() * 100);
-        telem.temperature_cdeg = int16_t(temperature() * 100);
+        //telem.temperature_cdeg = int16_t(temperature() * 100);
+        telem.temperature_cdeg = int16_t(motorTemperature() * 100);
 
         update_telem_data(addr, telem,
-            AP_ESC_Telem_Backend::TelemetryType::CURRENT |
-            AP_ESC_Telem_Backend::TelemetryType::VOLTAGE |
             AP_ESC_Telem_Backend::TelemetryType::TEMPERATURE |
             AP_ESC_Telem_Backend::TelemetryType::MOTOR_TEMPERATURE);
 
@@ -60,7 +65,8 @@ bool AP_PiccoloCAN_ESC::handle_can_frame(AP_HAL::CANFrame &frame)
     } else if (decodeESC_StatusCPacketStructure(&frame, &status.statusC)) {
         AP_ESC_Telem_Backend::TelemetryData telem {};
 
-        telem.temperature_cdeg = temperature() * 100;
+        //telem.temperature_cdeg = temperature() * 100;
+        telem.temperature_cdeg = int16_t(motorTemperature() * 100);
         update_telem_data(addr, telem, AP_ESC_Telem_Backend::TelemetryType::TEMPERATURE);
         newTelemetry = true;
     } else if (decodeESC_WarningErrorStatusPacket(&frame, &status.warnings, &status.errors, &extended, &status.warnings, &status.errors)) {
@@ -145,7 +151,7 @@ uint32_t getESCVelocityPacketID(const void* pkt)
     AP_HAL::CANFrame* frame = (AP_HAL::CANFrame*) pkt;
 
     // Extract the message ID field from the 29-bit ID
-    return (uint32_t) ((frame->id >> 16) & 0xFF);
+    return (uint32_t) ((frame->id >> 12) & 0x0F);
 }
 
 #endif // HAL_PICCOLO_CAN_ENABLE

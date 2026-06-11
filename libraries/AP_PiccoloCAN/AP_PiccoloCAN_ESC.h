@@ -45,11 +45,11 @@ public:
 
     virtual bool is_enabled(void) const override { return !is_sw_inhibited() && !is_hw_inhibited(); }
 
-    float voltage() { return (float) status.statusB.voltage * 0.01f; }      // Convert to V
-    float current() { return (float) status.statusB.current * 0.01f; }      // Convert to A
+    float voltage() { return (float) status.statusA.motorVoltage * 0.1f; }      // Convert to V
+    float current() { return (float) status.statusA.QCurrent_2 * 0.1f; }      // Convert to A
     uint16_t rpm() { return status.statusA.rpm; }
-    float temperature() { return MAX(status.statusB.escTemperature, status.statusC.fetTemperature); }
-    float motorTemperature() { return status.statusB.motorTemperature; }
+    float temperature() { return MAX(status.statusB.escTemperature -60.0, status.statusC.fetTemperature); }//offset -60
+    float motorTemperature() { return status.statusB.motorTemperature -60.0; }//offset -60
 
     int16_t command;    //! Raw command to send to each ESC
     bool newCommand;    //! Is the command "new"?
@@ -64,6 +64,18 @@ public:
         ESC_WarningBits_t warnings;
         ESC_ErrorBits_t errors;
     } status;
+
+    // Status / telemetry data iee
+    struct Status_VCU3 {
+        uint16_t rpm;              //!< Motor speed
+        uint16_t motorVoltage;     //!< ESC Rail Voltage
+        int16_t  ACCurrent;        //!< ESC Current. //Current IN to the ESC is positive. Current OUT of the ESC is negative
+
+        uint16_t DTC_enum;         //!< Error Report
+        uint8_t  motorTemperature; //!< ESC Motor Temperature Celsius offset -40
+        uint8_t  MCUTemperature;   //!< ESC Logic Board Temperature Celsius offset -40
+        uint8_t  life_enum;        //!< 0~15
+    } status_iee;
 
     // Settings information
     struct Settings_t {

@@ -385,8 +385,8 @@ void AP_MotorsYT::output_armed_stabilizing()
     if(throttle_thrust < 0.5F)arg_F_Z_N = (_Mass_kg * 9.8F * 1.4F) + throttle_thrust * (-2.0F) * (_Mass_kg * 9.8F * 1.4F);
     else arg_F_Z_N = -(_Mass_kg * _H_DDOT_Max_mps2) + throttle_thrust * (_Mass_kg * _H_DDOT_Max_mps2) * 2.0F;
 
-    hal.console->printf("\n\n Input r= %.2f, p= %.2f, y= %.2f, t= %.4f \n\n", roll_thrust, pitch_thrust, yaw_thrust, throttle_thrust);
-    hal.console->printf("\n\n InputLin L= %.3f, M= %.3f, N= %.3f, Fz= %.3f \n\n", arg_L_NM, arg_M_NM, arg_N_NM, arg_F_Z_N);
+    //hal.console->printf("\n\n Input r= %.2f, p= %.2f, y= %.2f, t= %.4f \n\n", roll_thrust, pitch_thrust, yaw_thrust, throttle_thrust);
+    //hal.console->printf("\n\n InputLin L= %.3f, M= %.3f, N= %.3f, Fz= %.3f \n\n", arg_L_NM, arg_M_NM, arg_N_NM, arg_F_Z_N);
    
     // if(throttle_thrust < _throttle_trim)
     // {
@@ -687,8 +687,8 @@ void AP_MotorsYT::output_armed_stabilizing()
     _thrust_rpyt_out[19] = _thrust_rpyt_out_22t[21];
     _thrust_rpyt_out[20] = _thrust_rpyt_out_22t[20];
     _thrust_rpyt_out[21] = _thrust_rpyt_out_22t[21];
-    hal.console->printf("\n\n OutputT m1= %.2f, m8= %.2f, m9= %.2f, m18= %.2f \n\n", _thrust_rpyt_out[0], _thrust_rpyt_out[7], _thrust_rpyt_out[8], _thrust_rpyt_out[17]);
-    hal.console->printf("\n\n OutputT m19= %.2f, m20= %.2f \n\n", _thrust_rpyt_out[18], _thrust_rpyt_out[19]);
+    //hal.console->printf("\n\n OutputT m1= %.2f, m8= %.2f, m9= %.2f, m18= %.2f \n\n", _thrust_rpyt_out[0], _thrust_rpyt_out[7], _thrust_rpyt_out[8], _thrust_rpyt_out[17]);
+    //hal.console->printf("\n\n OutputT m19= %.2f, m20= %.2f \n\n", _thrust_rpyt_out[18], _thrust_rpyt_out[19]);
     //hal.console->printf("\n\n OutputT m1= %.3f, m8= %.3f, m9= %.3f, m20= %.3f \n\n", _thrust_rpyt_out_22t[0], _thrust_rpyt_out_22t[7], _thrust_rpyt_out_22t[8], _thrust_rpyt_out_22t[19]);
 
     // determine throttle thrust for harmonic notch

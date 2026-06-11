@@ -333,10 +333,10 @@ const char* ESCCommandPackets_EnumLabel(int value);
  */
 typedef enum
 {
-    PKT_ESC_STATUS_A = 0x80,      //!< ESC Status A telemetry packet transmitted by the ESC at regular intervals
-    PKT_ESC_STATUS_B,             //!< ESC Status B telemetry packet transmitted by the ESC at regular intervals
-    PKT_ESC_STATUS_C,             //!< ESC Status C telemetry packet transmitted by the ESC at regular intervals
-    PKT_ESC_STATUS_D,             //!< ECC Status D telemetry packet transmitted by the ESC at regular intervals
+    PKT_ESC_STATUS_A = 0x03,      //!< ESC Status A telemetry packet transmitted by the ESC at regular intervals
+    PKT_ESC_STATUS_B = 0x01,             //!< ESC Status B telemetry packet transmitted by the ESC at regular intervals
+    PKT_ESC_STATUS_C = 0x02,      //!< ESC Status C telemetry packet transmitted by the ESC at regular intervals
+    PKT_ESC_STATUS_D = 0x04,             //!< ECC Status D telemetry packet transmitted by the ESC at regular intervals
     PKT_ESC_ACCELEROMETER = 0x88  //!< Raw accelerometer data
 } ESCStatusPackets;
 
