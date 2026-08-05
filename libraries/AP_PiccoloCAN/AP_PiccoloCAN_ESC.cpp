@@ -36,6 +36,7 @@ bool AP_PiccoloCAN_ESC::handle_can_frame(AP_HAL::CANFrame &frame)
     }
 
     addr -= 1;
+    if(addr>7)addr -= 8;
 
     uint8_t extended;
     if (decodeESC_StatusAPacketStructure(&frame, &status.statusA)) {

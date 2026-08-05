@@ -240,12 +240,17 @@ void AP_PiccoloCAN::loop()
             // Extract group and device ID values from the frame identifier
             // frame_id_group = (rxFrame.id >> 24) & 0x1F;
             // frame_id_device = (rxFrame.id >> 8) & 0xFF;
+            uint16_t frame_id_device = (rxFrame.id >> 12) & 0x0F;
 
             // Only accept extended messages
             // if ((rxFrame.id & AP_HAL::CANFrame::FlagEFF) == 0) {
             //     continue;
             // }
-            //hal.console->printf("\n\n NFCY test! %.2f \n\n", 1.234f);
+            // Only accept messages ID end with 10XX 20XX 30XX
+            if (!(frame_id_device==0x01 || frame_id_device==0x02 || frame_id_device==0x03)) {
+                continue;
+            }
+            hal.console->printf("\n\n NFCY test! %d \n\n", frame_id_device);
             //hal.console->printf("\n\n NFCY test! %lX \n", ((rxFrame.id >> 8) & 0xFF)==0x02 ? ((rxFrame.id >> 8) & 0xFF):0x18);
             //hal.console->printf("\n\n NFCY test! %0lX with 0 to 7: %X, %X, %X, %X, %X, %X, %X, %X", rxFrame.id, rxFrame.data[0], rxFrame.data[1], rxFrame.data[2], rxFrame.data[3], rxFrame.data[4], rxFrame.data[5], rxFrame.data[6], rxFrame.data[7]);
             // write_frame(rxFrame, timeout);
@@ -313,12 +318,19 @@ bool AP_PiccoloCAN::read_frame(AP_HAL::CANFrame &recv_frame, uint32_t timeout_us
 
     if (!ret || !read_select) {
         // No frame available
+        // hal.console->printf("\n\n No frame available! ");
         return false;
     }
 
     uint64_t time;
     AP_HAL::CANIface::CanIOFlags flags {};
 
+    if(_can_iface->receive(recv_frame, time, flags) == 1){
+        // hal.console->printf("\n\n read_frame return true");
+    }
+    else{
+        // hal.console->printf("\n\n read_frame return false");
+    }
     return (_can_iface->receive(recv_frame, time, flags) == 1);
 }
 
@@ -485,6 +497,28 @@ void AP_PiccoloCAN::send_esc_telemetry_mavlink(uint8_t mav_chan)
 }
 #endif
 
+uint8_t AP_PiccoloCAN::CRC8_07(uint8_t *data, uint16_t len)
+{
+    uint8_t crc = 0x00;
+    uint16_t i, j;
+    for(i = 0; i < len; i++)
+    {
+        crc ^= data[i];
+        for(j = 0; j < 8; j++)
+        {
+            if(crc & 0x80)
+            {
+                crc = (crc << 1) ^ 0x07;
+            }
+            else
+            {
+                crc <<= 1;
+            }
+        }
+    }
+    return crc;
+}
+
 // send servo messages over CAN
 void AP_PiccoloCAN::send_servo_messages(void)
 {
@@ -495,58 +529,76 @@ void AP_PiccoloCAN::send_servo_messages(void)
         return;
     }
 
-    bool send_cmd = false;
-    int16_t cmd[4] {};
-    uint8_t idx;
+    //bool send_cmd = false;
+    int16_t servo_cmd[4] {};
+    uint8_t servo_counter = counter++;
+    //uint8_t idx;
 
     // Transmit bulk command packets to 4x servos simultaneously
     for (uint8_t ii = 0; ii < PICCOLO_CAN_MAX_GROUP_SERVO; ii++) {
 
-        send_cmd = false;
+        //send_cmd = false;
 
-        for (uint8_t jj = 0; jj < 4; jj++) {
+        // for (uint8_t jj = 0; jj < 4; jj++) {
             
-            idx = (ii * 4) + jj;
+        //     idx = (ii * 4) + jj;
 
-            // Set default command value if an output field is unused
-            cmd[jj] = 0x7FFF;
+        //     // Set default command value if an output field is unused
+        //     cmd[jj] = 0x7FFF;
 
-            // Skip servo if the output is not enabled
-            if (!is_servo_channel_active(idx)) {
-                continue;
-            }
+        //     // Skip servo if the output is not enabled
+        //     if (!is_servo_channel_active(idx)) {
+        //         continue;
+        //     }
 
-            /* Check if the servo is enabled.
-             * If it is not enabled, send an enable message.
-             */
+        //     /* Check if the servo is enabled.
+        //      * If it is not enabled, send an enable message.
+        //      */
 
-            if (!is_servo_present(idx) || !is_servo_enabled(idx)) {
-                // Servo is not enabled
-                encodeServo_EnablePacket(&txFrame);
-                txFrame.id |= (idx + 1);
-                write_frame(txFrame, 1000);
-            } else if (_servos[idx].newCommand) {
-                // A new command is provided
-                send_cmd = true;
-                cmd[jj] = _servos[idx].command;
-                _servos[idx].newCommand = false;
-            }
-        }
+        //     if (!is_servo_present(idx) || !is_servo_enabled(idx)) {
+        //         // Servo is not enabled
+        //         encodeServo_EnablePacket(&txFrame);
+        //         txFrame.id |= (idx + 1);
+        //         write_frame(txFrame, 1000);
+        //     } else if (_servos[idx].newCommand) {
+        //         // A new command is provided
+        //         send_cmd = true;
+        //         cmd[jj] = _servos[idx].command;
+        //         _servos[idx].newCommand = false;
+        //     }
+        // }
 
-        if (send_cmd) {
-            encodeServo_MultiPositionCommandPacket(
-                &txFrame,
-                cmd[0],
-                cmd[1],
-                cmd[2],
-                cmd[3],
-                (PKT_SERVO_MULTI_COMMAND_1 + ii)
-            );
+        if (true) {//(send_cmd||true) {
+            // encodeServo_MultiPositionCommandPacket(
+            //     &txFrame,
+            //     cmd[0],
+            //     cmd[1],
+            //     cmd[2],
+            //     cmd[3],
+            //     (PKT_SERVO_MULTI_COMMAND_1 + ii)
+            // );
 
-            // Broadcast the command to all servos
-            txFrame.id |= 0xFF;
+            servo_cmd[ii] =(int) round((ii == 1 || ii == 2 ? 2991:-2991) / 3 * hal.rcout->scale_esc_to_unity(SRV_Channels::srv_channel(22)->get_output_pwm()));
+                // Broadcast the command to all servos
+            
+            txFrame.id = (0x9F1A20|(ii+4)*2) << 8;//0x1F1A2800
+            //hal.console->printf("\n\n NFCY test! ii = %d, id = %ld \n", ii, txFrame.id，);
+            
+            txFrame.dlc = 8;
+            txFrame.data[0] = servo_counter;
+            txFrame.data[1] = (uint8_t)(servo_cmd[ii]);//lower bits
+            txFrame.data[2] = (uint8_t)(servo_cmd[ii]>>8);//higher bits
+            txFrame.data[3] = 0x00U;//lifenumber
 
-            write_frame(txFrame, 1000);
+            txFrame.data[4] = 0x00U;
+            txFrame.data[5] = 0x00U;
+            txFrame.data[6] = 0x00U;
+
+            uint8_t tx_data[7] {txFrame.data[0], txFrame.data[1], txFrame.data[2], txFrame.data[3], txFrame.data[4], txFrame.data[5], txFrame.data[6] };
+            txFrame.data[7] = CRC8_07(tx_data, 7);
+            
+            bool result = write_frame(txFrame, 1000);
+            hal.console->printf("\n\n NFCY test! result = %d \n", result);
         }
     }
 }
@@ -570,7 +622,9 @@ void AP_PiccoloCAN::send_esc_messages(void)
     // System is armed - send out ESC commands
     if (true) {//if (hal.util->get_soft_armed())
 
-        uint8_t motor_num = 20;
+        uint8_t motor_num_start = 15;
+        uint8_t motor_num = 6;
+
         bool send_cmd = false;
         bool is_armed = hal.util->get_soft_armed();//
         //bool is_armed2 = copter.arming.is_armed();
@@ -579,10 +633,12 @@ void AP_PiccoloCAN::send_esc_messages(void)
         //
         uint16_t ecs_raw[motor_num] {};
         //uint16_t ecs_raw_last[4] {0,0,0,0};
-        bool ecs_dir[motor_num] {};//direction true = CCW = +1 or false = CW = -1
+        uint8_t ecs_dir[motor_num] {};//direction true = CCW = +1 or false = CW = -1
         //float voltage[motor_num] {};
-        int16_t cmd_max = 6800;
-        int16_t speed_limit = 6600;
+        const static int16_t cmd_max_canard = 6800;
+        const static int16_t speed_limit_canard = 6600;
+        const static int16_t cmd_max_wing = 6200;
+        const static int16_t speed_limit_wing = 6000;
         //static const int16_t slope_limit_up = 12;
         uint8_t enable_flag[motor_num] {};
         // enable_flag[0] = 0x00;
@@ -640,7 +696,7 @@ void AP_PiccoloCAN::send_esc_messages(void)
             // } else {
             //     voltage[ii] = 0;
             // }
-            if (send_cmd||true) {//if (send_cmd)
+            if (true||send_cmd) {//if (send_cmd)
                 encodeESC_CommandMultipleESCsPacket(
                     &txFrame,
                     cmd[0],
@@ -651,44 +707,33 @@ void AP_PiccoloCAN::send_esc_messages(void)
                 );
 
                 //
-                cmd_max = ii>7? cmd_max-500:cmd_max;
-                ecs_raw[ii] = cmd_max * (hal.rcout->scale_esc_to_unity(SRV_Channels::srv_channel(23)->get_output_pwm()) + 1.0) / 2.0;
+                //cmd_max = ii>7? cmd_max-500:cmd_max;
+                ecs_raw[ii] = (ii + motor_num_start > 8? cmd_max_wing:cmd_max_canard) * (hal.rcout->scale_esc_to_unity(SRV_Channels::srv_channel(23)->get_output_pwm()) + 1.0) / 2.0;
                 //this.get_voltage(ii, voltage)
 
                 //speed truncate
                 ecs_raw[ii] = (ecs_raw[ii]/100)*100;
                 
                 //speed limit
-                speed_limit = ii>7? speed_limit-500:speed_limit;
-                ecs_raw[ii] = ecs_raw[ii] > speed_limit ? speed_limit : ecs_raw[ii];
-
-                
-
-                //slope limit
-                // if(ecs_raw[ii]>ecs_raw_last[ii])
-                // {
-                //     ecs_raw[ii] = ecs_raw[ii]-ecs_raw_last[ii] > slope_limit_up ? ecs_raw_last[ii]+slope_limit_up : ecs_raw[ii];
-                // }
-                // else//slope down
-                // {
-                //     ecs_raw[ii] = ecs_raw[ii]-ecs_raw_last[ii] < -slope_limit_up ? ecs_raw_last[ii]-slope_limit_up : ecs_raw[ii];
-                // }
-                // ecs_raw_last[ii] = ecs_raw[ii];
-                
-                //
-                //voltage[ii] = _escs[ii].voltage() * 10.0;
-                //
-                //voltage[ii] = 600.0;
-                //hal.console->printf("\n\n NFCY test! _ecs[%d], voltage = %f \n", ii, voltage[ii]);
-                //
-                if(!is_armed)
+                if(ii+motor_num_start>8)
                 {
-                    enable_flag[ii] = 0x00;
+                    ecs_raw[ii] = ecs_raw[ii] > speed_limit_wing ? speed_limit_wing : ecs_raw[ii];
                 }
                 else
                 {
-                    //enable_flag[ii] = 0x03;
-                    enable_flag[ii] = ii==6? 0x03: 0x00;
+                    ecs_raw[ii] = ecs_raw[ii] > speed_limit_canard ? speed_limit_canard : ecs_raw[ii];
+                }
+
+                
+                if(is_armed)
+                {
+                    enable_flag[ii] = 0x03;
+                    // enable_flag[ii] = ii+motor_num_start==17? 0x03: 0x00;
+                }
+                else
+                {
+                    enable_flag[ii] = 0x00;
+                    //enable_flag[ii] = ii==6||ii==7? 0x03: 0x00;
                     // if(ii==0){enable_flag[ii] = 0x14;}
                     // else if(ii==1){enable_flag[ii] = 0x24;}
                     // else if(ii==2){enable_flag[ii] = 0x24;}
@@ -717,9 +762,9 @@ void AP_PiccoloCAN::send_esc_messages(void)
                 //     txFrame.id = 0x80000004;
                 //     ecs_dir[ii] = true;
                 // }
-                txFrame.id = 0x80000000|(ii+1);
+                txFrame.id = 0x80000000|(ii+motor_num_start);
                 //hal.console->printf("\n\n NFCY test! ii = %d, id = %ld \n", ii, txFrame.id & 0x000000FF);
-                ecs_dir[ii] = ii > 7 ? (ii%2 > 0 ? false: true):(ii%2 > 0 ? true: false);
+                ecs_dir[ii] = ii + motor_num_start > 8 ? (ii%2 > 0 ? -1: 1):(ii%2 > 0 ? 1: -1);
                 txFrame.dlc = 8;
                 txFrame.data[0] = enable_flag[ii];
                 txFrame.data[1] = 0x00U;//lifenumber
@@ -787,7 +832,7 @@ bool AP_PiccoloCAN::handle_esc_message(AP_HAL::CANFrame &frame)
     addr -= 1;
 
     // Maximum number of ESCs allowed
-    if (addr >= 19) {
+    if (addr >= PICCOLO_CAN_MAX_NUM_ESC) {
         return false;
     }
 

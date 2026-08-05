@@ -91,6 +91,8 @@ private:
     // read frame on CAN bus, returns true on succses
     bool read_frame(AP_HAL::CANFrame &recv_frame, uint32_t timeout_us);
 
+    uint8_t CRC8_07(uint8_t *data, uint16_t len);
+
     // send ESC commands over CAN
     void send_esc_messages(void);
 
@@ -111,7 +113,7 @@ private:
 #endif
 
     bool _initialized;
-    char _thread_name[16];
+    char _thread_name[20];
     uint8_t _driver_index;
     AP_HAL::CANIface* _can_iface;
     HAL_BinarySemaphore sem_handle;
@@ -133,6 +135,8 @@ private:
 
     AP_Int16 _ecu_id;        //! ECU Node ID
     AP_Int16 _ecu_hz;       //! ECU update rate (Hz)
+
+    uint8_t counter = 0;
 
     HAL_Semaphore _telem_sem;
 };
