@@ -226,13 +226,13 @@ void AP_PiccoloCAN::loop()
             send_servo_messages();
         }
 
-#if AP_EFI_CURRAWONG_ECU_ENABLED
+//#if AP_EFI_CURRAWONG_ECU_ENABLED
         // Transmit ecu throttle commands at regular intervals
         if (ecu_tx_counter++ > ecuCmdRateMs) {
             ecu_tx_counter = 0;
             send_ecu_messages();
         }
-#endif
+//#endif
 
         // Look for any message responses on the CAN bus
         while (read_frame(rxFrame, 250)) {
@@ -535,7 +535,7 @@ void AP_PiccoloCAN::send_servo_messages(void)
     //uint8_t idx;
 
     // Transmit bulk command packets to 4x servos simultaneously
-    for (uint8_t ii = 0; ii < PICCOLO_CAN_MAX_GROUP_SERVO; ii++) {
+    for (uint8_t ii = 0; ii < 4; ii++) {//PICCOLO_CAN_MAX_GROUP_SERVO
 
         //send_cmd = false;
 
@@ -578,11 +578,11 @@ void AP_PiccoloCAN::send_servo_messages(void)
             //     (PKT_SERVO_MULTI_COMMAND_1 + ii)
             // );
 
-            servo_cmd[ii] =(int) round((ii == 1 || ii == 2 ? 2991:-2991) / 3 * hal.rcout->scale_esc_to_unity(SRV_Channels::srv_channel(22)->get_output_pwm()));
+            servo_cmd[ii] =(int) round((ii == 1 || ii == 2 ? 2991:-2991) * hal.rcout->scale_esc_to_unity(SRV_Channels::srv_channel(20)->get_output_pwm()));
                 // Broadcast the command to all servos
             
             txFrame.id = (0x9F1A20|(ii+4)*2) << 8;//0x1F1A2800
-            //hal.console->printf("\n\n NFCY test! ii = %d, id = %ld \n", ii, txFrame.id，);
+            //hal.console->printf("\n\n NFCY test! ii = %d, id = %ld \n", ii, txFrame.id);
             
             txFrame.dlc = 8;
             txFrame.data[0] = servo_counter;
@@ -597,8 +597,10 @@ void AP_PiccoloCAN::send_servo_messages(void)
             uint8_t tx_data[7] {txFrame.data[0], txFrame.data[1], txFrame.data[2], txFrame.data[3], txFrame.data[4], txFrame.data[5], txFrame.data[6] };
             txFrame.data[7] = CRC8_07(tx_data, 7);
             
-            bool result = write_frame(txFrame, 1000);
-            hal.console->printf("\n\n NFCY test! result = %d \n", result);
+            write_frame(txFrame, 1000);
+            
+            //bool result = write_frame(txFrame, 800);
+            //hal.console->printf("\n\n NFCY test! result = %d \n", result);
         }
     }
 }
@@ -622,8 +624,8 @@ void AP_PiccoloCAN::send_esc_messages(void)
     // System is armed - send out ESC commands
     if (true) {//if (hal.util->get_soft_armed())
 
-        uint8_t motor_num_start = 15;
-        uint8_t motor_num = 6;
+        uint8_t motor_num_start = 9;
+        uint8_t motor_num = 12;
 
         bool send_cmd = false;
         bool is_armed = hal.util->get_soft_armed();//
@@ -839,25 +841,58 @@ bool AP_PiccoloCAN::handle_esc_message(AP_HAL::CANFrame &frame)
     return _escs[addr].handle_can_frame(frame);
 }
 
-#if AP_EFI_CURRAWONG_ECU_ENABLED
+//#if AP_EFI_CURRAWONG_ECU_ENABLED
 void AP_PiccoloCAN::send_ecu_messages(void)
 {
     AP_HAL::CANFrame txFrame {};
 
+    //uint8_t bcu_counter = counter++;
+    //uint8_t bcu_on_off_cmd = 0;
+    //uint8_t vehicle_status = 0;
+    uint8_t bcu_on_off_cmd = 0;
+    bool vehicle_status_is_armed = hal.util->get_soft_armed();//
+    
     // No ECU node id set, don't send anything
-    if (_ecu_id == 0) {
-        return;
-    }
+    // if (_ecu_id == 0) {
+    //     return;
+    // }
 
-    if (_ecu_info.newCommand) {
-        encodeECU_ThrottleCommandPacket(&txFrame, _ecu_info.command);
-        txFrame.id |= (uint8_t) _ecu_id;
+    // if (_ecu_info.newCommand) {
+    //     encodeECU_ThrottleCommandPacket(&txFrame, _ecu_info.command);
+    //     txFrame.id |= (uint8_t) _ecu_id;
 
-        _ecu_info.newCommand = false;
+    //     //_ecu_info.newCommand = false;
 
+    //     //write_frame(txFrame, 1000);
+    // }
+    if (true) {
+        bcu_on_off_cmd =(int) (hal.rcout->scale_esc_to_unity(SRV_Channels::srv_channel(22)->get_output_pwm())/ -2.0 + 1.5 );
+        // Broadcast the command to all servos
+        
+        txFrame.id = 0x9F720000;//0x1F720000
+        //hal.console->printf("\n\n NFCY test! ii = %d, id = %ld \n", ii, txFrame.id);
+            
+        txFrame.dlc = 8;
+        // txFrame.data[0] = bcu_counter;
+        // txFrame.data[1] = bcu_on_off_cmd;
+        // txFrame.data[2] = vehicle_status_is_armed?0xAAU:0x55U;//higher bits
+        
+        txFrame.data[0] = bcu_on_off_cmd;
+        txFrame.data[1] = vehicle_status_is_armed?0xAAU:0x55U;//higher bits
+        txFrame.data[2] = 0x00U;
+        txFrame.data[3] = 0x00U;//lifenumber
+
+        txFrame.data[4] = 0x00U;
+        txFrame.data[5] = 0x00U;
+        txFrame.data[6] = 0x00U;
+
+        //uint8_t tx_data[7] {txFrame.data[0], txFrame.data[1], txFrame.data[2], txFrame.data[3], txFrame.data[4], txFrame.data[5], txFrame.data[6] };
+        txFrame.data[7] = 0x00U;
+            
         write_frame(txFrame, 1000);
     }
 }
+
 
 bool AP_PiccoloCAN::handle_ecu_message(AP_HAL::CANFrame &frame)
 {
@@ -868,7 +903,7 @@ bool AP_PiccoloCAN::handle_ecu_message(AP_HAL::CANFrame &frame)
     }
     return false;
 }
-#endif // AP_EFI_CURRAWONG_ECU_ENABLED
+//#endif // AP_EFI_CURRAWONG_ECU_ENABLED
 
 /**
  * Check if a given servo channel is "active" (has been configured for Piccolo control output)

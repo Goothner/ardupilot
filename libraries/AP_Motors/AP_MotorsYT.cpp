@@ -685,8 +685,8 @@ void AP_MotorsYT::output_armed_stabilizing()
     _thrust_rpyt_out[17] = _thrust_rpyt_out_22t[19];
     _thrust_rpyt_out[18] = _thrust_rpyt_out_22t[20];
     _thrust_rpyt_out[19] = _thrust_rpyt_out_22t[21];
-    _thrust_rpyt_out[20] = _thrust_rpyt_out_22t[20];
-    _thrust_rpyt_out[21] = _thrust_rpyt_out_22t[21];
+    //_thrust_rpyt_out[20] = _thrust_rpyt_out_22t[20];//hal.rcout->scale_esc_to_unity(SRV_Channels::srv_channel(22)->get_output_pwm())
+    //_thrust_rpyt_out[21] = _thrust_rpyt_out_22t[21];
     //hal.console->printf("\n\n OutputT m1= %.2f, m8= %.2f, m9= %.2f, m18= %.2f \n\n", _thrust_rpyt_out[0], _thrust_rpyt_out[7], _thrust_rpyt_out[8], _thrust_rpyt_out[17]);
     //hal.console->printf("\n\n OutputT m19= %.2f, m20= %.2f \n\n", _thrust_rpyt_out[18], _thrust_rpyt_out[19]);
     //hal.console->printf("\n\n OutputT m1= %.3f, m8= %.3f, m9= %.3f, m20= %.3f \n\n", _thrust_rpyt_out_22t[0], _thrust_rpyt_out_22t[7], _thrust_rpyt_out_22t[8], _thrust_rpyt_out_22t[19]);
