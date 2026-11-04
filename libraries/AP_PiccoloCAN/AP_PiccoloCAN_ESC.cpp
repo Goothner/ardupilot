@@ -16,6 +16,7 @@
  */
 
 #include "AP_PiccoloCAN_ESC.h"
+//extern const AP_HAL::HAL& hal;
 
 #if HAL_PICCOLO_CAN_ENABLE
 
@@ -28,37 +29,43 @@ bool AP_PiccoloCAN_ESC::handle_can_frame(AP_HAL::CANFrame &frame)
     bool result = true;
 
     // The ESC address is the lower byte of the frame ID
-    uint8_t addr = frame.id & 0xFF;
+    uint8_t addr = (frame.id >> 4)& 0xFF;
 
     // Ignore any ESC with node ID of zero
-    if (addr == 0x00) {
+    if (addr == 0x28) {
         return false;
     }
 
-    addr -= 1;
-    if(addr>7)addr -= 8;
+    //hal.console->printf("\n\n addr/2! %d \n\n", addr/2);
+    addr /= 2;
+    //addr += 1;
+    //if(addr>15)addr -= 16;
 
     uint8_t extended;
     if (decodeESC_StatusAPacketStructure(&frame, &status.statusA)) {
-        AP_ESC_Telem_Backend::TelemetryData telem {};
+        //AP_ESC_Telem_Backend::TelemetryData telem {};
         
         update_rpm(addr, rpm());
-        telem.voltage = voltage();
-        telem.current = current();
-        update_telem_data(addr, telem,
-            AP_ESC_Telem_Backend::TelemetryType::CURRENT |
-            AP_ESC_Telem_Backend::TelemetryType::VOLTAGE);
+        //hal.console->printf("\n\n update_rpm! %d \n",addr);
+        // telem.voltage = voltage();
+        // telem.current = current();
+        // update_telem_data(addr, telem,
+        //     AP_ESC_Telem_Backend::TelemetryType::CURRENT |
+        //     AP_ESC_Telem_Backend::TelemetryType::VOLTAGE);
         newTelemetry = true;
     } else if (decodeESC_StatusBPacketStructure(&frame, &status.statusB)) {
         AP_ESC_Telem_Backend::TelemetryData telem {};
-
-        //telem.voltage = voltage() * 10;
-        //telem.current = current() * 10;
+        telem.voltage = voltage();
+        //hal.console->printf("\n\n voltage! %.2f \n\n",telem.voltage);
+        telem.current = current();
         telem.motor_temp_cdeg = int16_t(motorTemperature() * 100);
         //telem.temperature_cdeg = int16_t(temperature() * 100);
-        telem.temperature_cdeg = int16_t(motorTemperature() * 100);
-
+        telem.temperature_cdeg = int16_t(temperature() * 100);
+        //hal.console->printf("\n\n motor_temp_cdeg! %d \n",telem.motor_temp_cdeg);
+        //hal.console->printf("\n ecs_temp_cdeg! %d \n\n",telem.temperature_cdeg);
         update_telem_data(addr, telem,
+            AP_ESC_Telem_Backend::TelemetryType::CURRENT |
+            AP_ESC_Telem_Backend::TelemetryType::VOLTAGE |
             AP_ESC_Telem_Backend::TelemetryType::TEMPERATURE |
             AP_ESC_Telem_Backend::TelemetryType::MOTOR_TEMPERATURE);
 
@@ -66,7 +73,7 @@ bool AP_PiccoloCAN_ESC::handle_can_frame(AP_HAL::CANFrame &frame)
     } else if (decodeESC_StatusCPacketStructure(&frame, &status.statusC)) {
         AP_ESC_Telem_Backend::TelemetryData telem {};
 
-        //telem.temperature_cdeg = temperature() * 100;
+        telem.temperature_cdeg = temperature() * 100;
         telem.temperature_cdeg = int16_t(motorTemperature() * 100);
         update_telem_data(addr, telem, AP_ESC_Telem_Backend::TelemetryType::TEMPERATURE);
         newTelemetry = true;
@@ -152,7 +159,7 @@ uint32_t getESCVelocityPacketID(const void* pkt)
     AP_HAL::CANFrame* frame = (AP_HAL::CANFrame*) pkt;
 
     // Extract the message ID field from the 29-bit ID
-    return (uint32_t) ((frame->id >> 12) & 0x0F);
+    return (uint32_t) ((frame->id) & 0x0F);
 }
 
 #endif // HAL_PICCOLO_CAN_ENABLE

@@ -277,13 +277,17 @@ int decodeESC_VoltageCommandPacket(const void* pkt, uint16_t* voltageCommand);
  */
 typedef struct
 {
+    uint8_t         counterA;
     uint16_t        rpm;               //!< Motor speed
-    uint16_t        motorVoltage;     //!< VfMCU1_MotorVoltage_V
+    uint16_t        rpm_echo;          //!< Motor speed_cmd_echo
+    uint8_t         motor_stat1;
+    uint8_t         motor_stat2;
+    //uint16_t        motorVoltage;     //!< VfMCU1_MotorVoltage_V
     // uint16_t        ACCurrent;        //!< VfMCU1_ACCurrent_A
     // uint8_t         IGBTEnable;       //!< VbMCU1_IGBTEnable_flag
     // uint8_t         life1_enum;       //!< VeMCU1_life1_enum
-    int16_t         DCurrent_2;    //replace mode
-    int16_t         QCurrent_2;
+    //int16_t         DCurrent_2;    //replace mode
+    //int16_t         QCurrent_2;
     uint8_t          mode;    //!< ESC operating mode. The lower four bits indicate the operational mode of the ESC, in accordance with the ESCOperatingModes enumeration. The upper three bits are used for debugging and should be ignored for general use.
     ESC_StatusBits_t status;  //!< ESC status bits
     uint16_t         command; //!< ESC operational command - value depends on 'mode' available in this packet. If the ESC is disabled, data reads 0x0000. If the ESC is in open-loop PWM mode, this value is the PWM command in units of 1us, in the range 1000us to 2000us. If the ESC is in closed-loop RPM mode, this value is the RPM command in units of 1RPM
@@ -319,15 +323,14 @@ int decodeESC_StatusAPacket(const void* pkt, uint8_t* mode, ESC_StatusBits_t* st
  */
 typedef struct
 {
-    uint8_t  CH_enabled;         //!< added
+    uint8_t  counterB;         //!< added
     uint16_t voltage;          //!< ESC Rail Voltage
-    uint8_t  errLv;
-    uint8_t  current;            //!< ESC Current. Current IN to the ESC is positive. Current OUT of the ESC is negative
-    uint16_t dutyCycle;       //!< ESC Motor Duty Cycle uint16->uint8
+    uint16_t torque;
+    uint8_t  current;          //!< ESC Current. Current IN to the ESC is positive. Current OUT of the ESC is negative
+    uint16_t dutyCycle;        //!< ESC Motor Duty Cycle uint16->uint8
     // uint8_t   escTemperature;   //!< ESC Logic Board Temperature
-    uint8_t  escTemperature;   //!<ESC1 Temperature
-    uint8_t  motorTemperature; //!< ESC Motor Temperature
-    uint8_t  esc2Temperature; //!< ESC Temperature
+    uint8_t  escTemperature;   //!<ESC Logic Board Temperature
+    uint8_t  motorTemperature; //!< Motor Temperature
 }ESC_StatusB_t;
 
 //! Create the ESC_StatusB packet

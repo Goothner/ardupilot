@@ -1354,15 +1354,16 @@ int decodeESC_StatusAPacketStructure(const void* _pg_pkt, ESC_StatusA_t* _pg_use
     // Reserved for future use
 
 
-    // Motor AC Voltage dV
-    // Range of motorVoltage is -3276.8 to +3276.7
-    _pg_user->motorVoltage = uint16FromLeBytes(_pg_data, &_pg_byteindex) - 32768;
+    // Reserved for counter
+    _pg_user->counterA = uint8FromBytes(_pg_data, &_pg_byteindex); 
 
     // Motor speed
-    // Range of rpm is -32768 to +32767
-    uint16_t rpm_temp = uint16FromLeBytes(_pg_data, &_pg_byteindex);
-    _pg_user->rpm =  rpm_temp > 32768 ? rpm_temp - 32768 : 32768 - rpm_temp;
-   
+    // Range of rpm is 0 to 65535
+    _pg_user->rpm = uint16FromLeBytes(_pg_data, &_pg_byteindex);   
+
+    // Motor speed command echo
+    // Range of rpm_echo is 0 to 65535
+    _pg_user->rpm_echo = uint16FromLeBytes(_pg_data, &_pg_byteindex);   
 
     // ESC operating mode. The lower four bits indicate the operational mode of the ESC, in accordance with the ESCOperatingModes enumeration. The upper three bits are used for debugging and should be ignored for general use.
     // Range of mode is 0 to 15.
@@ -1370,13 +1371,17 @@ int decodeESC_StatusAPacketStructure(const void* _pg_pkt, ESC_StatusA_t* _pg_use
 
     // Motor Channel 2 D-axis current
     // Range of current is -3276.8 to +3276.7
-    _pg_user->DCurrent_2 = uint16FromLeBytes(_pg_data, &_pg_byteindex) - 32768;
+    _pg_user->motor_stat1 = uint8FromBytes(_pg_data, &_pg_byteindex); 
 
     // Motor Channel 2 Q-axis current
     // Range of current is -3276.8 to +3276.7
-    _pg_user->QCurrent_2 = uint16FromLeBytes(_pg_data, &_pg_byteindex) - 32768;
+    _pg_user->motor_stat2 = uint8FromBytes(_pg_data, &_pg_byteindex);
 
-    _pg_byteindex += 1; // close bit field
+    // // Motor AC Voltage dV
+    // // Range of motorVoltage is -3276.8 to +3276.7
+    // _pg_user->motorVoltage = uint16FromLeBytes(_pg_data, &_pg_byteindex) - 32768;
+
+    _pg_byteindex += 1; // close bit field with CRC
 
     // // ESC status bits
     // if(decodeESC_StatusBits_t(_pg_data, &_pg_byteindex, &_pg_user->status) == 0)
@@ -1565,27 +1570,33 @@ int decodeESC_StatusBPacketStructure(const void* _pg_pkt, ESC_StatusB_t* _pg_use
     _pg_data = getESCVelocityPacketDataConst(_pg_pkt);
 
     // 
-    // 
-    _pg_user->CH_enabled = uint8FromBytes(_pg_data, &_pg_byteindex);
+    // Counter 0~255
+    _pg_user->counterB = uint8FromBytes(_pg_data, &_pg_byteindex);
 
-    // ESC Logic Board1 Temperature
-    // Range of escTemperature is 0-60 to 255-60.
-    uint8_t esc1T1 = int8FromBytes(_pg_data, &_pg_byteindex);
-    uint8_t esc1T2 = int8FromBytes(_pg_data, &_pg_byteindex);
-    uint8_t esc1T3 = int8FromBytes(_pg_data, &_pg_byteindex);
-    _pg_user->escTemperature = (esc1T1 > esc1T2 ? ((esc1T1) > (esc1T3) ? (esc1T1) : (esc1T3)) : ((esc1T2) > (esc1T3) ? (esc1T2) : (esc1T3)));
+    // ESC Rail Voltage V
+    // Range of voltage is 0 to 65535.
+    _pg_user->voltage = uint8FromBytes(_pg_data, &_pg_byteindex) * 4;
 
     
-    // ESC Logic Board2 Temperature
-    // Range of motorTemperature is 0-60 to 255-60.
-    uint8_t esc2T1 = int8FromBytes(_pg_data, &_pg_byteindex);
-    uint8_t esc2T2 = int8FromBytes(_pg_data, &_pg_byteindex);
-    uint8_t esc2T3 = int8FromBytes(_pg_data, &_pg_byteindex);
-    _pg_user->esc2Temperature = (esc2T1 > esc2T2 ? ((esc2T1) > (esc2T3) ? (esc2T1) : (esc2T3)) : ((esc2T2) > (esc2T3) ? (esc2T2) : (esc2T3)));
+    uint8_t motorWindingT1 = int8FromBytes(_pg_data, &_pg_byteindex);
 
-    // // ESC Rail Voltage
-    // // Range of voltage is 0 to 65535.
-    // _pg_user->voltage = uint16FromLeBytes(_pg_data, &_pg_byteindex);
+    // Motor Torque NM
+    // Range of torque is 0 to 510.
+    _pg_user->torque = int8FromBytes(_pg_data, &_pg_byteindex) * 2;
+    uint8_t motorContollerT1 = int8FromBytes(_pg_data, &_pg_byteindex);
+    uint8_t motorWindingT2 = int8FromBytes(_pg_data, &_pg_byteindex);
+    uint8_t motorContollerT2 = int8FromBytes(_pg_data, &_pg_byteindex);
+
+    // Motor Temperature °C
+    // Range of motorTemperature is -40 to 215.
+    _pg_user->motorTemperature = (motorWindingT1 > motorWindingT2 ? motorWindingT1 : motorWindingT2);
+
+    
+    // ESC Logic Board Temperature °C
+    // Range of esc2Temperature is -40 to 215.
+    _pg_user->escTemperature = (motorContollerT1 > motorContollerT2 ? motorContollerT1 : motorContollerT2);
+
+    _pg_byteindex += 1;//close bitfield with CRC
 
     // // ESC Current. Current IN to the ESC is positive. Current OUT of the ESC is negative
     // // Range of current is -32768 to 32767.
@@ -1593,15 +1604,15 @@ int decodeESC_StatusBPacketStructure(const void* _pg_pkt, ESC_StatusB_t* _pg_use
 
     // Motor Temperature
     // Range of motorTemperature is 0-60 to 255-60.
-    _pg_user->motorTemperature = int8FromBytes(_pg_data, &_pg_byteindex);
+    //_pg_user->motorTemperature = int8FromBytes(_pg_data, &_pg_byteindex);
 
-    //
-    //
-    _pg_user->errLv = int8FromBytes(_pg_data, &_pg_byteindex);
+    // //
+    // //
+    // _pg_user->errLv = int8FromBytes(_pg_data, &_pg_byteindex);
 
-    // ESC Motor Duty Cycle
-    // Range of dutyCycle is 0 to 65535.
-    _pg_user->dutyCycle = int8FromBytes(_pg_data, &_pg_byteindex);
+    // // ESC Motor Duty Cycle
+    // // Range of dutyCycle is 0 to 65535.
+    // _pg_user->dutyCycle = int8FromBytes(_pg_data, &_pg_byteindex);
 
     return 1;
 

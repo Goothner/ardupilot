@@ -27,7 +27,7 @@
 
 #if HAL_PICCOLO_CAN_ENABLE
 
-#define PICCOLO_CAN_MAX_NUM_ESC 20
+#define PICCOLO_CAN_MAX_NUM_ESC 40
 #define PICCOLO_CAN_MAX_GROUP_ESC (PICCOLO_CAN_MAX_NUM_ESC / 4)
 
 
@@ -45,11 +45,11 @@ public:
 
     virtual bool is_enabled(void) const override { return !is_sw_inhibited() && !is_hw_inhibited(); }
 
-    float voltage() { return (float) status.statusA.motorVoltage * 0.1f; }      // Convert to V
-    float current() { return (float) status.statusA.QCurrent_2 * 0.1f; }      // Convert to A
+    float voltage() { return (float) status.statusB.voltage*0.1F; }      // Convert to V
+    float current() { return (float) status.statusB.torque; }      // Convert to A
     uint16_t rpm() { return status.statusA.rpm; }
-    float temperature() { return MAX(status.statusB.escTemperature -60.0, status.statusC.fetTemperature); }//offset -60
-    float motorTemperature() { return status.statusB.motorTemperature -60.0; }//offset -60
+    float temperature() { return (float)(status.statusB.escTemperature) - 40.0; }//offset -40 MAX(status.statusB.escTemperature, status.statusC.fetTemperature) 
+    float motorTemperature() { return (float)(status.statusB.motorTemperature) -40.0; }//offset -40
 
     int16_t command;    //! Raw command to send to each ESC
     bool newCommand;    //! Is the command "new"?

@@ -119,7 +119,7 @@ private:
     HAL_BinarySemaphore sem_handle;
 
     AP_PiccoloCAN_Servo _servos[PICCOLO_CAN_MAX_NUM_SERVO];
-    AP_PiccoloCAN_ESC _escs[PICCOLO_CAN_MAX_NUM_ESC];
+    AP_PiccoloCAN_ESC _escs[PICCOLO_CAN_MAX_NUM_ESC/2];
 
     struct CurrawongECU_Info_t {
         float command;
@@ -136,9 +136,49 @@ private:
     AP_Int16 _ecu_id;        //! ECU Node ID
     AP_Int16 _ecu_hz;       //! ECU update rate (Hz)
 
-    uint8_t counter = 0;
-
+    uint8_t uni_counter = 0;
+    uint8_t servo_counter = 0;
     HAL_Semaphore _telem_sem;
 };
+//                 if(ii+motor_num_start==1) txFrame.id = 0x9F310000;//1A
+//                 if(ii+motor_num_start==2) txFrame.id = 0x9F410010;//1B
+//                 if(ii+motor_num_start==3) txFrame.id = 0x9F110020;//2A
+//                 if(ii+motor_num_start==4) txFrame.id = 0x9F510030;//2B
+//                 if(ii+motor_num_start==5) txFrame.id = 0x9F110040;//3A
+//                 if(ii+motor_num_start==6) txFrame.id = 0x9F410050;//3B
+//                 if(ii+motor_num_start==7) txFrame.id = 0x9F510060;//4A
+//                 if(ii+motor_num_start==8) txFrame.id = 0x9F610070;//4B
+//                 if(ii+motor_num_start==9) txFrame.id = 0x9F210080;//5A
+//                 if(ii+motor_num_start==10)txFrame.id = 0x9F310090;//5B
+//                 if(ii+motor_num_start==11)txFrame.id = 0x9F2100A0;//6A
+//                 if(ii+motor_num_start==12)txFrame.id = 0x9F5100B0;//6B
+//                 if(ii+motor_num_start==13)txFrame.id = 0x9F2100C0;//7A
+//                 if(ii+motor_num_start==14)txFrame.id = 0x9F6100D0;//7B
+//                 if(ii+motor_num_start==15)txFrame.id = 0x9F3100E0;//8A
+//                 if(ii+motor_num_start==16)txFrame.id = 0x9F6100F0;//8B
+//                 if(ii+motor_num_start==17)txFrame.id = 0x9F110100;//9A
+//                 if(ii+motor_num_start==18)txFrame.id = 0x9F610110;//9B
+//                 if(ii+motor_num_start==19)txFrame.id = 0x9F410120;//10A
+//                 if(ii+motor_num_start==20)txFrame.id = 0x9F510130;//10B
+//                 if(ii+motor_num_start==21)txFrame.id = 0x9F110140;//11A
+//                 if(ii+motor_num_start==22)txFrame.id = 0x9F310150;//11B
+//                 if(ii+motor_num_start==23)txFrame.id = 0x9F110160;//12A
+//                 if(ii+motor_num_start==24)txFrame.id = 0x9F410170;//12B
+//                 if(ii+motor_num_start==25)txFrame.id = 0x9F310180;//13A
+//                 if(ii+motor_num_start==26)txFrame.id = 0x9F510190;//13B
+//                 if(ii+motor_num_start==27)txFrame.id = 0x9F2101A0;//14A
+//                 if(ii+motor_num_start==28)txFrame.id = 0x9F6101B0;//14B
+//                 if(ii+motor_num_start==29)txFrame.id = 0x9F1101C0;//15A
+//                 if(ii+motor_num_start==30)txFrame.id = 0x9F6101D0;//15B
+//                 if(ii+motor_num_start==31)txFrame.id = 0x9F2101E0;//16A
+//                 if(ii+motor_num_start==32)txFrame.id = 0x9F5101F0;//16B
+//                 if(ii+motor_num_start==33)txFrame.id = 0x9F110200;//17A
+//                 if(ii+motor_num_start==34)txFrame.id = 0x9F210210;//17B
+//                 if(ii+motor_num_start==35)txFrame.id = 0x9F310220;//18A
+//                 if(ii+motor_num_start==36)txFrame.id = 0x9F510230;//18B
+//                 if(ii+motor_num_start==37)txFrame.id = 0x9F410240;//19A
+//                 if(ii+motor_num_start==38)txFrame.id = 0x9F610250;//19B
+//                 if(ii+motor_num_start==39)txFrame.id = 0x9F210260;//20A
+//                 if(ii+motor_num_start==40)txFrame.id = 0x9F410270;//20B
 
 #endif // HAL_PICCOLO_CAN_ENABLE
